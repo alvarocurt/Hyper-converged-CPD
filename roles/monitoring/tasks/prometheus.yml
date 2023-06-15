@@ -1,0 +1,44 @@
+---
+- name: Obtener IDs de hosts
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && onehost show {{ item }} | awk 'NR==2 {print $3}'"
+    executable: /bin/bash
+  register: monitoring_ids_output
+  changed_when: false
+  loop: "{{ groups['hipervisores'] }}"
+
+- name: Crear diccionario
+  ansible.builtin.set_fact:
+    monitoring_host_ids: "{{ monitoring_host_ids | default({}) | combine({item.item: item.stdout}) }}"
+  loop: "{{ monitoring_ids_output.results }}"
+  changed_when: false
+
+- name: Creación de fichero /etc/one/prometheus/prometheus.yml
+  ansible.builtin.template:
+    src: templates/prometheus.yml.j2
+    dest: /etc/one/prometheus/prometheus.yml
+    mode: '660'
+    group: oneadmin
+  notify: Reiniciar prometheus
+
+- name: Directorio para normas de prometheus
+  ansible.builtin.file:
+    path: /etc/one/prometheus/rules/
+    state: directory
+    mode: '755'
+
+- name: Descarga de ficheros de normas de prometheus
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/one/prometheus/rules/
+    mode: '644'
+    group: oneadmin
+  loop:
+    - files/ceph_alerts.yml
+    - files/one_alerts.yml
+  notify: Reiniciar prometheus
+
+- name: Elimino fichero de normas anterior
+  ansible.builtin.file:
+    path: /etc/one/prometheus/rules.yml
+    state: absent

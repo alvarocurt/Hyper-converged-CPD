@@ -1,0 +1,20 @@
+---
+- name: Genero claves ssh para root en hosts
+  community.crypto.openssh_keypair:
+    path: /root/.ssh/id_rsa
+    state: present
+
+- name: Recupero claves de hosts
+  ansible.builtin.fetch:
+    src: /root/.ssh/id_rsa.pub
+    dest: ".buffer/{{ ansible_hostname }}-id_rsa.pub"
+    flat: true # de ser false sumaría el path del fichero a "dest".
+
+- name: Incluyo las claves a authorized_keys de los hosts.
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '.buffer/{{ item }}-id_rsa.pub') }}"
+#      when: item != ansible_hostname   Si quisiera evitar que se puedan hacer ssh a sí mismos.
+  with_items: "{{ groups['all'] }}"
+# loop: "{{ groups['all']|flatten(levels=1) }}"

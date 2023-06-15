@@ -1,0 +1,18 @@
+---
+- name: Activo servicios de exporters
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - opennebula-exporter.service
+    - opennebula-node-exporter.service
+    - opennebula-libvirt-exporter.service
+  listen: Reiniciar one-exporters
+
+- name: Reiniciar y habilitar prometheus
+  ansible.builtin.systemd:
+    name: opennebula-prometheus
+    state: restarted
+    enabled: true
+  listen: Reiniciar prometheus

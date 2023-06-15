@@ -1,0 +1,16 @@
+### Hosts sobre los que se van a levantar VMs
+[hipervisores] 
+host-[01:05]
+
+### Numero impar de hosts hipervisores (mínimo 3) con los MON y MGR de Ceph
+[ceph_admins]  
+host-01
+host-03
+host-05
+
+[hipervisores:children]
+ceph_admins
+
+### Hosts para el frontend de OpenNebula (impares, mínimo 3). Pueden coincidir con algunos de los hipervisores o no.
+[frontend]    
+host-[01:03]

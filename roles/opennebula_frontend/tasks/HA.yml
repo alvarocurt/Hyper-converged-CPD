@@ -1,0 +1,74 @@
+---
+- name: Tareas del primer host de la zona de HA
+  when: ansible_hostname == groups['frontend'][0]
+  block:
+    - name: Añadir el primer host a la zona 0 de OpenNebula
+      ansible.builtin.shell: "echo 'onezone server-add 0 --name {{ ansible_hostname }} --rpc http://{{ ansible_host }}:2633/RPC2' >> /root/comando"
+
+    - name: Detener servicio OpenNebula en el primer host
+      ansible.builtin.service:
+        name: opennebula
+        state: stopped
+
+    - name: Cambiar el SERVER_ID del primer host dentro de la zona
+      ansible.builtin.lineinfile:
+        path: /etc/one/oned.conf
+        regexp: \s*SERVER_ID\s*=.*
+        line: "    SERVER_ID     = 0,"
+# mover a default vars pero de una vamos. Sustituir eth0 por la br_mgmt, otro reto
+    - name: Habilitar hooks de IP flotante en el primer host
+      ansible.builtin.blockinfile:
+        path: /etc/one/oned.conf
+        insertafter: RAFT\s=\\s[\s*(?:[^=\n]*\s*=\s*[^,\n]*,?\s*)*]
+        block: |
+          # Executed when a server transits from follower->leader
+          RAFT_LEADER_HOOK = [
+               COMMAND = "raft/vip.sh",
+               ARGUMENTS = "leader eth0 {{ vip }}/24"
+          ]
+
+          # Executed when a server transits from leader->follower
+          RAFT_FOLLOWER_HOOK = [
+              COMMAND = "raft/vip.sh",
+              ARGUMENTS = "follower eth0 {{ vip }}/24"
+          ]
+
+    - name: Volver a arrancar OpenNebula en el primer host
+      ansible.builtin.service:
+        name: opennebula
+        state: started
+
+    # shell: onedb backup -u {userdb} -p {passwordb} -d opennebula
+
+    # fetch este fichero, hay que usar find porque no se el nombre exacto
+    # fetch directorio /var/lib/one/.one/ entero
+
+
+
+
+
+
+## Para iterar en varias tareas creo que es necesario crear otro task_file
+
+# - name: Configuración de frontend en HA
+#   ansible.builtin.import_tasks: HA.yml
+#   when: 
+#     - not HA_result['failed']
+#     - ansible_hostname == item
+#   loop: "{{ groups['frontend'] }}"
+
+
+### Las tareas sonn
+
+# copy la copia de la base de datos
+# copy el directorio /var/lib/one/.one/ sobreescribiendolo entero. Borrar el anterior de hecho
+# Detener opennebula
+# onedb restore -f -u oneadmin -p oneadmin -d opennebula /tmp/mysql_localhost_opennebula_2017-6-1_11:52:47.sql
+# SERVER0, con delegate_to, añadir el huevo host a la zona
+# editar /etc/one/oned.conf con nuevo SERVER_ID
+# editar /etc/one/oned.conf con nuevos hooks de RAFT
+# Arrancar opennebula de nuevo
+# Opcional hacer onezone serversync
+# Reiniciar fireedge
+
+# https://docs.opennebula.io/6.6/installation_and_configuration/ha/frontend_ha.html

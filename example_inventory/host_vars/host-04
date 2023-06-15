@@ -1,0 +1,29 @@
+### IP para la red de gestión
+ansible_host: 10.95.54.244
+### IP para la red de almacenamiento de Ceph
+cluster_ip: 10.100.100.244
+
+### Plantilla de netplan para la configuración de red (si variable config_netplan a true)
+netplan_file: |
+  ---
+  network:
+    bridges:
+      br_mgmt:
+        addresses:
+        - {{ ansible_host }}/24
+        routes:
+        - to: default
+          via: 10.95.54.1
+        interfaces: [eno2]
+      br_storage:
+        addresses:
+        - {{ cluster_ip }}/24
+        interfaces: [enp3s0]
+    ethernets:
+      eno2: {}
+      enp3s0: {}
+    version: 2
+
+### Listado (opcional) de dispositivos de almacenamiento para Ceph. Solo tiene sentido en hipervisores.
+storage_devices:
+  - /dev/sdb

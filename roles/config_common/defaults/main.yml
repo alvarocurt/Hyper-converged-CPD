@@ -1,0 +1,39 @@
+---
+### passwordless.yml
+passwordless: true
+permitrootlogin: 'yes'  # Opciones son yes, prohibit-password, forced-commands-only o no.
+passwordauthentication: 'yes' # Opciones son yes o no.
+
+### mutual_ssh.yml
+mutual_ssh: true
+
+### ntp.yml
+config_ntp: true
+timedatectl_timezone: Europe/Madrid
+timedatectl_timeservers_fallback: ['0.es.pool.ntp.org', '1.es.pool.ntp.org', '2.es.pool.ntp.org', '3.es.pool.ntp.org']
+
+### configuración de /etc/hosts
+config_etc_hosts: true
+
+### netplan.yml
+config_netplan: false
+
+### cloud_init.yml
+disable_cloud_init: false
+
+### opennebula_repo.yml
+config_one_repo: true
+opennebula_dependencies:
+  - gnupg
+  - wget
+  - apt-transport-https
+opennebula_repo: https://enterprise.opennebula.io/repo/6.6.1/Ubuntu/22.04
+opennebula_enterprise: false
+
+### known_hosts.yml
+config_known_hosts: false
+public_keys:
+  - ssh-dss
+  - ssh-rsa
+  - ecdsa-sha2-nistp256
+  - ssh-ed25519

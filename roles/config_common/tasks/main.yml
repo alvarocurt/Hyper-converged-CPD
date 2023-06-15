@@ -1,0 +1,40 @@
+---
+- name: Passwordless sudo y ssh
+  ansible.builtin.import_tasks: passwordless.yml
+  when: passwordless
+
+- name: Passwordless ssh entre hosts
+  ansible.builtin.import_tasks: mutual_ssh.yml
+  when: mutual_ssh
+
+- name: Configuración NTP de los host
+  ansible.builtin.import_tasks: ntp.yml
+  when: config_ntp
+
+- name: Modificar archivo /etc/hosts
+  ansible.builtin.lineinfile:
+    insertafter: "127.0.1.1*"
+    path: /etc/hosts
+    regexp: '^{{ hostvars[item].ansible_host }}\\s+{{ hostvars[item].inventory_hostname }}.*$'
+    line: '{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}'
+  loop: "{{ groups['all'] }}"
+  when: config_etc_hosts
+
+- name: Configuración de netplan
+  ansible.builtin.import_tasks: netplan.yml
+  when: config_netplan
+
+- name: Deshabilitar cloud.init
+  ansible.builtin.import_tasks: cloud_init.yml
+  when: disable_cloud_init
+
+- name: Añadir repositorios de opennebula enterprise
+  ansible.builtin.import_tasks: opennebula_repo.yml
+  when: config_one_repo
+
+- name: Distribución de fingerprints entre hosts
+  ansible.builtin.import_tasks: known_hosts.yml
+  when: config_known_hosts
+
+- name: Activo handlers
+  ansible.builtin.meta: flush_handlers

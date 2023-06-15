@@ -1,0 +1,25 @@
+---
+- name: Verificar si ya hay clúster de Ceph desplegado
+  ansible.builtin.stat::
+    path: /var/lib/ceph/stat_bootstrap
+  register: ceph_check_bootstrap
+
+- name: Bootstrap de Ceph
+  ansible.builtin.command:
+    cmd: "cephadm --image {{ ceph_image }} bootstrap --mon-ip {{ cluster_ip }} --skip-monitoring-stack --skip-dashboard"
+  when: not ceph_check_bootstrap.stat.exists
+  changed_when: false
+
+### Para configurar dashboard
+# {{ ceph_dashboard | default(false) | ternary('--initial-dashboard-user ' ~ ceph_dashboard_user ~
+#      ' --initial-dashboard-password ' ~ ceph_dashboard_password ~ ' --dashboard-password-noupdate --allow-fqdn-hostname',
+#      '--skip-dashboard') }}
+# ceph_dashboard: false
+# ceph_dashboard_user: admin
+# ceph_dashboard_password: labpassword
+
+- name: Registrar bootstrap de Ceph
+  ansible.builtin.copy:
+    content: "Ceph cluster bootstrap complete."
+    dest: /var/lib/ceph/stat_bootstrap
+    mode: '0644'

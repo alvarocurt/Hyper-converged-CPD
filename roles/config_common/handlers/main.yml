@@ -1,0 +1,28 @@
+---
+- name: Reiniciando sshd
+  ansible.builtin.systemd:
+    name: sshd
+    state: restarted
+  listen: Reiniciar sshd
+
+- name: Reiniciar cron
+  ansible.builtin.systemd:
+    name: cron.service
+    state: restarted
+  listen: Restart crond
+
+- name: Reiniciar systemd-timesyncd
+  ansible.builtin.systemd:
+    name: systemd-timesyncd.service
+    state: restarted
+  listen: Restart Timesyncd
+
+- name: Activar ntp en timedatectl
+  ansible.builtin.command: timedatectl set-ntp true
+  listen: Run Timedatectl
+
+- name: Reiniciar Networkd
+  ansible.builtin.systemd:
+    name: systemd-networkd
+    state: restarted
+  listen: Reiniciar Networkd

@@ -1,0 +1,20 @@
+---
+- name: Instalar opennebula-node-kvm
+  ansible.builtin.apt:
+    name: opennebula-node-kvm # opennebula-node-kvm=6.6.0-1
+    state: present
+  register: opennebula_kvm_install_result
+  until: opennebula_kvm_install_result is successful
+  notify:
+    - Restart Libvirt
+    - Apt Autoremove
+
+- name: Copio el fichero known_hosts al .ssh de oneadmin
+  ansible.builtin.copy:
+    src: /root/.ssh/known_hosts
+    dest: /var/lib/one/.ssh/known_hosts
+    owner: oneadmin
+    group: oneadmin
+    mode: '0644'
+    remote_src: true
+  when: config_known_hosts

@@ -1,0 +1,23 @@
+ansible-galaxy collection list
+
+# /Users/cxb0519/.ansible/collections/ansible_collections
+Collection        Version
+----------------- -------
+ansible.posix     1.4.0
+community.crypto  2.10.0
+community.general 5.5.0
+community.mysql
+
+Si falta alguna colección, instalar con 
+ansible-galaxy collection install community.crypto
+
+
+Funcionalidades futuras:
+- autentificación de otra forma en la primera conexión https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html
+- configuración extra en devices. Posibilidad de juntarlos en LVM
+- security.yml   añadir configuración a apparmor
+- seguir con el monitoring
+
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse.html#playbooks-reuse
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html#playbooks-prompts
+

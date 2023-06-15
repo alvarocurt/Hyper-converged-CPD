@@ -1,0 +1,8 @@
+---
+- name: Instalar paquetes de hipervisor kvm
+  ansible.builtin.import_tasks: kvm.yml
+  when: install_kvm
+
+- name: Configuración de credenciales de Ceph en libvirt
+  ansible.builtin.import_tasks: libvirt.yml
+  when: config_libvirt

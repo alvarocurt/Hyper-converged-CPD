@@ -1,0 +1,12 @@
+---
+- name: Reseteo unidades fallidas de systemctl
+  ansible.builtin.service:
+    name: libvirtd.service
+    state: restarted
+  listen: Restart Libvirt
+
+- name: Eliminar paquetes y dependencias inútiles
+  ansible.builtin.apt:
+    autoclean: true
+    autoremove: true
+  listen: Apt Autoremove

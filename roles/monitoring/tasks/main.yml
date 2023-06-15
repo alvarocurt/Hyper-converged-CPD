@@ -1,0 +1,15 @@
+---
+- name: Configuración exporters de OpenNebula
+  ansible.builtin.import_tasks: one_exporters.yml
+
+- name: Configuración exporters de ceph
+  ansible.builtin.import_tasks: ceph_exporters.yml
+  when: ansible_hostname == groups['ceph_admins'][0]
+
+- name: Configuración de prometheus
+  ansible.builtin.import_tasks: prometheus.yml
+  when: ansible_hostname in groups['frontend']
+
+- name: Configuración de alertmanager
+  ansible.builtin.import_tasks: alertmanager.yml
+  when: ansible_hostname in groups['frontend']

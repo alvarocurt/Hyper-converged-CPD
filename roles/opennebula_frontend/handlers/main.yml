@@ -1,0 +1,6 @@
+---
+- name: Reiniciar servicio oned
+  ansible.builtin.systemd:
+    name: "opennebula"
+    state: restarted
+  listen: Reiniciar oned

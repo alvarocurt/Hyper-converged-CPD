@@ -1,0 +1,22 @@
+---
+# CREATE USER 'oneadmin' IDENTIFIED BY '<thepassword>';
+# GRANT ALL PRIVILEGES ON opennebula.* TO 'oneadmin';
+- name: "Crear usuario de OpenNebula y asignar permisos"
+  community.mysql.mysql_user:
+    name: "{{ mysql_user }}"
+    host: '%'
+    password: "{{ mysql_password }}"
+    priv: "opennebula.*:ALL"
+    state: present
+
+# SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;
+- name: Establecer nivel de aislamiento de transacción global
+  community.mysql.mysql_variables:
+    mode: global # default
+    variable: transaction_isolation
+    value: READ-COMMITTED
+
+# Otra forma
+# - name: Establecer nivel de aislamiento de transacción global
+#   community.mysql.mysql_query:
+#     query: SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED;

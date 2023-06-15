@@ -1,0 +1,7 @@
+#!/bin/bash
+# Pools
+ceph osd pool create {{ rbd_pool }} --bulk
+rbd pool init {{ rbd_pool }}
+
+# Users
+ceph auth get-or-create client.{{ rbd_user }} mon 'profile rbd' osd 'profile rbd pool={{ rbd_pool }}'

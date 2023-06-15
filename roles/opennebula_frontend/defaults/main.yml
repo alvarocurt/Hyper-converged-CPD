@@ -1,0 +1,36 @@
+---
+### minione.yml
+configure_minione: false
+solo_front: false
+token: 1dc0be4b:_7w2x722
+
+### manual.yml
+opennebula_packets:
+  - opennebula
+  - opennebula-sunstone
+  - opennebula-fireedge
+  - opennebula-gate
+  - opennebula-flow
+# me salto opennebula-provision porque no se va a usar
+
+### config_oned.yml
+config_oned: true
+oned_db: |
+  DB = [ BACKEND = "mysql",
+         SERVER  = "localhost",
+         PORT    = 0,
+         USER    = "{{ mysql_user }}",
+         PASSWD  = "{{ mysql_password }}",
+         DB_NAME = "opennebula",
+         CONNECTIONS = 25,
+         COMPARE_BINARY = "no" ]
+oneadmin_password: labpassword
+  # checkov:skip=CKV_SECRET_6: ADD REASON
+servicios_opennebula:
+  - opennebula
+  - opennebula-sunstone
+  - opennebula-fireedge
+  - opennebula-gate
+  - opennebula-flow
+
+### HA.yml

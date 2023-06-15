@@ -1,0 +1,28 @@
+---
+- name: Descargar minione
+  ansible.builtin.get_url:
+    url: https://github.com/OpenNebula/minione/releases/download/v6.6.0.1/minione
+    dest: /tmp/minione
+    mode: 644
+
+- name: INSTALACIÓN MINIONE
+  ansible.builtin.shell:
+    cmd: "bash /tmp/minione --enterprise {{ token }}{{ solo_front | ternary(' --frontend', '') }} --yes
+         --password  {{ oneadmin_password }}"
+
+# ### Checks & detection
+# Checking augeas is installed  SKIP will try to install
+# Checking apt-transport-https is installed  SKIP will try to install
+# Checking AppArmor  SKIP will try to modify
+# Checking for present ssh key  SKIP
+# Checking docker is installed  SKIP will try to install
+# Checking python3-pip is installed  SKIP will try to install
+# Checking ansible  SKIP will try to install
+# Checking terraform  SKIP will try to install
+
+# ### Main deployment steps:
+# Install OpenNebula frontend version 6.6
+# Install Terraform
+# Install Docker
+# Install  augeas-tools apt-transport-https python3-pip
+# Install pip 'ansible==2.9.9'

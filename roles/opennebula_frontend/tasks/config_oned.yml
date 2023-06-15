@@ -1,0 +1,50 @@
+---
+# Para sustituir bloques de texto sin marcas
+- name: Configuración de la base de datos de oned
+  ansible.builtin.replace:
+    path: /etc/one/oned.conf
+    regexp: ^DB\s=\s\[\s(?:[^]]+\s*)*]
+    replace: "{{ oned_db | trim }}"
+  notify: Reiniciar oned
+
+- name: Modifico las credenciales de oneadmin
+  ansible.builtin.lineinfile:
+    path: /var/lib/one/.one/one_auth
+    regexp: ^oneadmin:.*
+    line: "oneadmin:{{ oneadmin_password }}"
+  notify: Reiniciar oned
+
+- name: Configuro onegate
+  ansible.builtin.lineinfile:
+    path: /etc/one/onegate-server.conf
+    regexp: ^:host:.*
+    line: ":host: 0.0.0.0"
+  notify: Reiniciar oned
+
+- name: Actualizar oned.conf con el endpoint de onegate
+  ansible.builtin.replace:
+    path: /etc/one/oned.conf
+    regexp: ^#?ONEGATE_ENDPOINT\s=.*
+    replace: 'ONEGATE_ENDPOINT = "http://{{ vip }}:5030"'
+  notify: Reiniciar oned
+
+- name: Configuro oneflow
+  ansible.builtin.lineinfile:
+    path: /etc/one/oneflow-server.conf
+    regexp: ^:host:.*
+    line: ":host: 0.0.0.0"
+  notify: Reiniciar oned
+
+- name: Configuro el endpoint de FireEdge (necesario)
+  ansible.builtin.lineinfile:
+    path: /etc/one/sunstone-server.conf
+    regexp: ^:public_fireedge_endpoint:.*
+    line: ":public_fireedge_endpoint: http://{{ vip }}:2616"
+  notify: Reiniciar oned
+
+- name: Arranco servicios OpenNebula y enabled
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ servicios_opennebula }}"

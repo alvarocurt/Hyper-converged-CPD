@@ -1,0 +1,31 @@
+---
+- name: Instalar dependencias
+  ansible.builtin.apt:
+    name: "{{ opennebula_dependencies }}"
+    state: present
+    update_cache: true   # para que haga apt update
+  register: config_common_onerepo_result
+  until: config_common_onerepo_result is successful
+
+  # El uso de apt_key está deprecated.
+- name: Añado clave firmada del repositorio
+  ansible.builtin.get_url:
+    url: https://downloads.opennebula.io/repo/repo2.key
+    dest: /usr/share/keyrings/opennebula_repo2.key
+    mode: '644'
+    force: true # Actualizar siempre
+
+- name: Copio credenciales enterprise
+  ansible.builtin.template:
+    src: opennebula.conf.j2
+    dest: /etc/apt/auth.conf.d/opennebula.conf
+    mode: '644'
+  when: opennebula_enterprise
+
+# los escribe en /etc/apt/sources.list.d Lo mismo que comando apt-add-repository
+- name: Añado repositorios oficiales opennebula
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/opennebula_repo2.key] {{ opennebula_repo }} stable opennebula"
+    state: present
+    filename: opennebula
+    update_cache: true

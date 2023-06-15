@@ -1,0 +1,27 @@
+---
+- name: Verificar existencia de datasource_list
+  ansible.builtin.stat:
+    path: /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+  register: config_common_stat_result
+  ignore_errors: true
+
+- name: Vaciar datasource_list
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+    regex: '^datasource_list:.*'
+    line: 'datasource_list: [ None ]'
+  when: config_common_stat_result.stat.exists
+
+- name: Desinstalar paquete cloud-init
+  ansible.builtin.apt:
+    name: cloud-init
+    state: absent
+    purge: true
+
+- name: Eliminar ficheros restantes
+  ansible.builtin.file:
+    state: absent
+    path: "{{ item }}"
+  loop:
+    - /etc/cloud/
+    - /var/lib/cloud/

@@ -1,0 +1,22 @@
+---
+- name: Obtener nombre de daemons tipo mgr del ceph
+  ansible.builtin.command: "ceph orch ps --service_name mgr --format json-pretty"
+  register: monitoring_ceph_output
+  changed_when: false
+
+- name: Extraer nombres
+  ansible.builtin.set_fact:
+    monitoring_mgrs_id: "{{ monitoring_ceph_output.stdout | from_json | map(attribute='daemon_id') | list }}"
+    monitoring_mgrs_host: "{{ monitoring_ceph_output.stdout | from_json | map(attribute='hostname') | list }}"
+
+- name: Script para configuración de los ceph-exporters
+  ansible.builtin.template:
+    src: templates/ceph_exporters.j2
+    dest: /tmp/ceph_exporters.sh
+    mode: '644'
+
+- name: Ejecución de script para configuración de los ceph-exporters
+  ansible.builtin.command:
+    cmd: bash /tmp/ceph_exporters.sh
+  register: monitoring_ceph_exporters
+  changed_when: monitoring_ceph_exporters.stderr != "module 'prometheus' is already enabled"

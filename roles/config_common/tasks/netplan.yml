@@ -1,0 +1,24 @@
+---
+- name: Comprobar configuración netplan existente
+  ansible.builtin.find:
+    paths: /etc/netplan
+    patterns: "*.yml,*.yaml"
+  register: netplan_configs
+
+- name: Eliminar configuración netplan existente
+  ansible.builtin.file:
+    path: "{{ item['path'] }}"
+    state: absent
+  with_items: "{{ netplan_configs['files'] }}"
+
+- name: Crear nuevo fichero de configuración de Netplan
+  ansible.builtin.copy:
+    content: "{{ netplan_file }}"
+    dest: /etc/netplan/01-netcfg.yaml
+    mode: '0644'
+  when: netplan_file != []
+
+- name: Netplan apply
+  ansible.builtin.command: netplan apply
+  notify: Reiniciar Networkd
+  changed_when: salida.rc != 0

@@ -1,0 +1,21 @@
+---
+### ceph_repo.yml
+config_ceph_repo: false
+ceph_repo: https://download.ceph.com/debian-quincy/
+
+### cephadm.yml
+install_cephadm: true
+cephadm_repo: https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+
+### bootstrap.yml
+bootstrap: true
+bootstrap_host: "{{ groups['ceph_admins'][0] }}"
+ceph_image: quay.io/ceph/ceph:v17.2.6
+
+### config.yml
+config_ceph: true
+add_hosts: true
+orch_specs: true
+ceph_commands: true
+rbd_pool: onepool
+rbd_user: oneclient

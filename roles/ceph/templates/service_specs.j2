@@ -1,0 +1,31 @@
+---
+service_type: crash
+placement:
+  host_pattern: '*'
+---
+service_type: mgr
+placement:
+  count: {{ (groups['hipervisores'] | length) + (groups['hipervisores'] | length % 2) - 1 }}
+  label: _admin
+---
+service_type: mon
+placement:
+  count: {{ (groups['hipervisores'] | length) + (groups['hipervisores'] | length % 2) - 1 }}
+  label: _admin
+---
+{% for host in groups['hipervisores'] %}
+{% if hostvars[host].storage_devices is defined %}
+service_type: osd
+service_id: osd_spec_{{ host}}
+placement: 
+  hosts:
+    - {{ host }}
+spec:
+  data_devices:
+    paths:
+{% for device in hostvars[host]['storage_devices'] %}
+      - {{ device }}
+{% endfor%}
+---
+{% endif %}
+{% endfor %}

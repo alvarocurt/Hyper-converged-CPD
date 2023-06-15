@@ -1,0 +1,39 @@
+---
+- name: Instalar dependencias de Docker
+  ansible.builtin.apt:
+    name: "{{ docker_dependencies }}"
+    state: present
+    update_cache: false   # ya se hizo en config_common
+  register: config_hiperv_depen_result
+  until: config_hiperv_depen_result
+
+- name: Añado clave GPG de Docker
+  ansible.builtin.get_url:
+    url: "{{ docker_repo }}/gpg"
+    dest: /usr/share/keyrings/docker.key
+    mode: '0644'
+    force: true # Actualizar siempre
+
+- name: Añado repositorio de Docker a apt
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/docker.key] {{ docker_repo }} {{ ansible_lsb.codename }} stable"
+    state: present
+    filename: docker
+
+- name: Instalo docker-ce, docker-ce-cli, docker-compose y containerd.io
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - docker-ce-rootless-extras
+      - containerd.io
+    state: present
+    update_cache: true
+  register: config_hiperv_docker_result
+  until: config_hiperv_docker_result is successful
+
+- name: Docker activo y enabled
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true

@@ -1,0 +1,9 @@
+[Unit]
+Description=Set Docker Forward Policy to ACCEPT
+After=docker.service
+ 
+[Service]
+ExecStart=/etc/docker-forward-accept/default.sh
+ 
+[Install]
+WantedBy=multi-user.target

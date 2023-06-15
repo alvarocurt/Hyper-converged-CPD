@@ -1,0 +1,11 @@
+---
+{% for host in groups['hipervisores'] %}
+service_type: host
+hostname: {{ host }}
+addr: {{ hostvars[host]['cluster_ip'] }}
+{% if host in groups['ceph_admins'] %}
+labels:
+- _admin
+{% endif %}
+---
+{% endfor %}

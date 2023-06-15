@@ -1,0 +1,69 @@
+---
+- name: Agregar clave pública ceph al resto de hosts
+  ansible.posix.authorized_key:
+    user: root
+    key: "{{ lookup('pipe', 'ssh root@' + hostvars[bootstrap_host].ansible_host + ' cat /etc/ceph/ceph.pub') }}"
+    state: present
+  when: ansible_hostname != bootstrap_host
+
+- name: Descargar manifiesto de hosts del cluster
+  ansible.builtin.template:
+    src: host_specs.j2
+    dest: /tmp/host_specs.yml
+    mode: '644'
+  when: ansible_hostname == bootstrap_host
+
+- name: Añadir hosts al cluster de ceph
+  when: add_hosts
+  block:
+    - name: Añadir hosts al cluster mediante orquestador
+      ansible.builtin.command:
+        cmd: ceph orch apply -i /tmp/host_specs.yml
+      when: bootstrap_host == ansible_hostname
+
+    - name: Compartir el fichero ceph.conf entre todos los hosts hipervisores
+      ansible.builtin.copy:
+        content: |
+          {{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' cat /etc/ceph/ceph.conf') }}
+        dest: "/etc/ceph/ceph.conf"
+        mode: '644'
+      when: ansible_hostname not in groups['ceph_admins']
+
+
+- name: Descargar manifiesto de deamons del cluster
+  ansible.builtin.template:
+    src: service_specs.j2
+    dest: /tmp/orch_specs.yml
+    mode: '644'
+  when: ansible_hostname == bootstrap_host
+
+- name: Configurar daemons del cluster
+  ansible.builtin.command:
+    cmd: ceph orch apply -i /tmp/orch_specs.yml
+  when:
+    - ansible_hostname == bootstrap_host
+    - orch_specs
+
+- name: Descargar script comandos
+  ansible.builtin.template:
+    src: comandos_ceph.j2
+    dest: /tmp/comandos.sh
+    mode: '644'
+  when: ansible_hostname == bootstrap_host
+
+- name: Creación de pool rbd y cliente rbd
+  ansible.builtin.command: bash /tmp/comandos.sh
+  when:
+    - ansible_hostname == bootstrap_host
+    - ceph_commands
+
+- name: Evitar conflicto entre ficheros logrotate
+  ansible.builtin.copy:
+    content: |
+      # editado en ANSIBLE
+      # fichero en blanco ya que hace conflicto con el logrotate de ceph-common
+      # ceph-common es más completo
+    dest: /etc/logrotate.d/cephadm
+    mode: '0644'
+  notify:
+    - Restart failed services

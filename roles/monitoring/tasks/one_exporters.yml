@@ -1,0 +1,16 @@
+---
+- name: Instalar opennebula-prometheus-kvm
+  ansible.builtin.apt:
+    name: opennebula-prometheus-kvm
+
+- name: Instalar opennebula-prometheus
+  ansible.builtin.apt:
+    name: opennebula-prometheus
+  when: ansible_hostname in groups['frontend']
+
+- name: Corrección de exporter de VMs
+  ansible.builtin.copy:
+    src: files/opennebula_vm_collector.rb
+    dest: /usr/lib/one/opennebula_exporter/opennebula_vm_collector.rb
+    mode: '644'
+  notify: Reiniciar one-exporters

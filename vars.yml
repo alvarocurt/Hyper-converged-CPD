@@ -1,0 +1,181 @@
+### Variables en orden de aparición en la ejecución del playbook
+### Todos los opcionales en false por defecto. Ir activando pasos extra deseados
+
+########################################################################
+###################### FINGERPRINTS ####################################
+########################################################################
+
+### Guardar fingerprint de hosts para poder hacer ssh en ellos en caso de no haber ssh en ellos anteriormente
+fingerprint_config: false
+
+
+########################################################################
+###################### CONFIG_COMMON ###################################
+########################################################################
+
+### Para módulos sobre sudo y ssh (ansible_user y root) sin contraseña
+passwordless: true
+### Habilitar ssh root. Opciones son yes, prohibit-password, forced-commands-only o no.
+# permitrootlogin: 'yes'
+### Permitir autenticación por contraseña en los hosts. Opciones son yes o no.
+# passwordauthentication: 'yes'
+
+### Permitir a los hosts hacerse root ssh entre ellos.
+mutual_ssh: true
+
+### Configurar servidores NTP de los host
+config_ntp: true
+# timedatectl_timezone: Europe/Madrid
+# timedatectl_timeservers_fallback: ['0.es.pool.ntp.org', '1.es.pool.ntp.org', '2.es.pool.ntp.org', '3.es.pool.ntp.org']
+
+### Modificar fichero /etc/hosts
+config_etc_hosts: true
+
+### Definir fichero netplan para la configuración de red de los hosts
+config_netplan: false
+# netplan_file:  en host_vars
+
+### Deshabilitar cloud-init
+disable_cloud_init: false
+
+### Hacer instalación de repositorio opennebula EE
+config_one_repo: true
+# Versión de opennebula a instalar
+# opennebula_repo: https://enterprise.opennebula.io/repo/6.6.1/Ubuntu/22.04
+# Credenciales en /common_repos/files/opennebula.conf
+opennebula_enterprise: false
+
+
+### Fichero .ssh/known_hosts común en todos los hosts. Puede evitar posibles prompts conflictivos pidiendo fingerprints
+### No usar, estoy 95% seguro de que está mal
+config_known_hosts: false
+
+
+########################################################################
+###################### CONFIG_HIPERV ###################################
+########################################################################
+
+### Purgado de dispositivos de almacenamiento que van a ser empleados para Ceph
+config_devices: false
+
+### Instalación de Docker
+install_docker: true
+# docker_repo: https://download.docker.com/linux/ubuntu
+
+### Servicio para poner la cadena FORWARD a ACCEPT de nuevo tras instalar docker
+config_iptables: true
+
+
+########################################################################
+###################### CEPH ############################################
+########################################################################
+
+### Hacer instalación de repositorio de Ceph. Ponga lo que ponga, si el host es Ubuntu 22.04 no se hace. A ver si sacan de una vez el repo para jammy macho...
+# config_ceph_repo: true
+### Aquí cambio el default por uno más cercano a España. En francia por ejemplo
+# ceph_repo: http://fr.ceph.com/debian-17.2.6/
+
+### Descargar e instalar cephadm y la cli de ceph en los hosts
+install_cephadm: true
+# cephadm_repo: https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+
+### Bootstrap de cluster ceph
+bootstrap: true
+### Host que va ejecutar el comando bootstrap, no importa cual sea y por defecto es el primero del grupo ceph_admins
+# bootstrap_host:
+### Imagen para los contenedores de cephadm
+# ceph_image: quay.io/ceph/ceph:v17.2.6
+
+### IMPORTANTE Revisar la plantilla de roles/ceph/templates/service_specs.j2 para ver si se adapta a lo buscado
+
+### Configuración general del cluster ceph. Necesario para hacer las siguientes opciones
+config_ceph: true
+### Aplicación de manifiesto yaml añadiendo nuevos hosts al cluster. NO IDEMPOTENTE
+add_hosts: true
+### Aplicación de manifiesto yaml de daemons del cluster ceph
+orch_specs: true
+### Script para la creación de pool rbd y usuario para OpenNebula
+ceph_commands: true
+rbd_pool: onepool
+rbd_user: oneclient
+
+
+########################################################################
+###################### OPENNEBULA_KVM ##################################
+########################################################################
+
+### Instalar paquete opennebula-kvm-node
+install_kvm: true
+
+### Establecer secreto de libvirt con credenciales del usuario de Ceph
+config_libvirt: true
+### Universally Unique IDentifier (UUID) gnerado con uuidgen. Lo meto aquí para que sea el mismo en todos los hosts
+UUID: f3a9bc96-cca0-4bea-be80-a00a4aabc3ad
+
+
+########################################################################
+###################### CONFIG_FRONTEND #################################
+########################################################################
+
+### Instalar MySQL
+install_mysql: true
+
+### Credenciales MySQL
+mysql_user: oneusersql
+mysql_password: sqlpassword
+  # checkov:skip=CKV_SECRET_6: ADD REASON
+
+########################################################################
+###################### OPENNEBULA_FRONTEND #############################
+########################################################################
+
+### Para hacer la instalación del frontend con minione (no recomendado). No válido para frontend en HA
+# configure_minione: false
+### En minione, hacer que el despliegue del frontend no incluya hipervisores.
+# solo_front: false
+# token: 1dc0be4b:_7w2x722
+oneadmin_password: labpassword
+  # checkov:skip=CKV_SECRET_6: ADD REASON
+
+### Para hacer la configuración de los ficheros de oned
+config_oned: true
+
+# Definir IP flotante de la red de gestión para HA si hay más de un host frontend. Si no defino habiendo >1 frontend, salta error
+# vip: 10.95.54.35
+
+########################################################################
+###################### EXPAND_OPENNEBULA ###############################
+########################################################################
+
+### Para configurar el opennebula con terraform
+### El entorno de ejecución de ansible debe tener acceso a la herramienta terraform!!
+expand_opennebula: true
+terraform_workspace: "terraform_workspace/"
+
+### Configuración de vnet
+extern_vnet_name: "management"
+extern_vnet_bridge: "br_srv"
+extern_vnet_ip: "10.100.200.100"
+extern_vnet_size: "20"
+extern_vnet_gateway: "10.95.54.1"
+extern_vnet_network_mask: "255.255.255.0"
+extern_vnet_dns: "10.95.121.180 10.95.121.189"
+extern_vnet_search_domain: "hi.inet"
+
+crear_private_net: true
+
+### Configuración de vnet privada de incluírla
+intern_vnet_name: "service"
+intern_vnet_bridge: "br_srv"
+intern_vnet_ip: "10.100.200.100"
+intern_vnet_size: "20"
+
+### La configuración de la vm, la plantilla y su imagen se hacen directamente sobre los ficheros de terraform
+crear_plantilla: true
+levantar_vm: false
+
+########################################################################
+###################### MONITORING ######################################
+########################################################################
+
+### modificar roles/monitoring/files/alertmanager.yml para establecer los endpoints

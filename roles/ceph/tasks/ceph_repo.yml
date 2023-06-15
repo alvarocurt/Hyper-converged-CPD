@@ -1,0 +1,15 @@
+---
+- name: Añado clave firmada del repositorio
+  ansible.builtin.get_url:
+    url: https://download.ceph.com/keys/release.asc
+    dest: /usr/share/keyrings/ceph.key
+    mode: '0644'
+    force: true
+
+# los escribe en /etc/apt/sources.list.d Lo mismo que comando apt-add-repository
+- name: Añado repositorio de Ceph
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/ceph.key] {{ ceph_repo }} {{ ansible_lsb.codename }} main"
+    state: present
+    filename: ceph
+    update_cache: true

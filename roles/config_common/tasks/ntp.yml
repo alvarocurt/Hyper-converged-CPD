@@ -1,0 +1,14 @@
+---
+- name: Asignar Timezone
+  community.general.timezone:
+    name: "{{ timedatectl_timezone }}"
+  notify: Restart crond
+
+- name: Configuración timesync
+  ansible.builtin.template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    mode: '644'
+  notify:
+    - Restart Timesyncd
+    - Run Timedatectl

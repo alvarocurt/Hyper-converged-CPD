@@ -1,0 +1,7 @@
+---
+- name: Instalar MySQL para OpenNebula
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop:
+    - mysql_install.yml
+    - mysql_config.yml
+  when: install_mysql

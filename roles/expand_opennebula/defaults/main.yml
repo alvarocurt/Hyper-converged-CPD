@@ -1,0 +1,31 @@
+---
+
+expand_opennebula: true
+
+### Clave default para oneadmin, la misma que en otros roles
+oneadmin_password: labpassword
+  # checkov:skip=CKV_SECRET_6: ADD REASON
+
+### Path relativo u absoluto al workspace
+terraform_workspace: "terraform_workspace/"
+
+### Parámetros default red externa/de gestión
+extern_vnet_name: "management"
+extern_vnet_bridge: "br_srv"
+extern_vnet_ip: "10.100.200.100"
+extern_vnet_size: "20"
+extern_vnet_gateway: "10.95.54.1"
+extern_vnet_network_mask: "255.255.255.0"
+extern_vnet_dns: "10.95.121.180 10.95.121.189"
+extern_vnet_search_domain: "hi.inet"
+
+### Por defecto no creo nada aparte de instanciar los recursos hardware y la vnet pública
+crear_private_net: false
+crear_plantilla: false
+levantar_vm: false   # No hace nada si crear_plantilla es falso
+
+### Parámetros default red privada de crearse
+intern_vnet_name: "service"
+intern_vnet_bridge: "br_srv"
+intern_vnet_ip: "10.100.200.100"
+intern_vnet_size: "20"

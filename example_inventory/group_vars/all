@@ -1,0 +1,13 @@
+# Usuario con el que acceder via ssh
+ansible_user: usuario
+# Contraseña del usuario
+ansible_ssh_pass: labpassword
+# Contraseña con la que hacer sudo para ser root desde el usuario
+ansible_sudo_pass: labpassword
+
+# Parámetro adicional si hay que atravesar proxy para llegar a hosts
+# ansible_ssh_common_args: -J proxy-socks
+
+### Credenciales de OpenNebula Enterprise Edition de tenerlas (poner también variable opennebula_enterprise a true)
+one_EE_login: loginlogin
+one_EE_password: passwordpassword

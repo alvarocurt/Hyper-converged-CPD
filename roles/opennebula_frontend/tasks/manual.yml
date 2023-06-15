@@ -1,0 +1,7 @@
+---
+- name: Instalar paquetes OpenNebula
+  ansible.builtin.apt:
+    name: "{{ opennebula_packets }}"
+    state: present
+  register: opennebula_frontend_install_result
+  until: opennebula_frontend_install_result is successful

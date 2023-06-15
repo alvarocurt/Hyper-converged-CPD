@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Include opennebula_frontend"
+      ansible.builtin.include_role:
+        name: "opennebula_frontend"

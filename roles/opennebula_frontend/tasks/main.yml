@@ -1,0 +1,26 @@
+---
+- name: Instalar Frontend OpenNebula con minione
+  ansible.builtin.import_tasks: minione.yml
+  when: configure_minione
+
+- name: Instalar Frontend OpenNebula manualmente
+  ansible.builtin.import_tasks: manual.yml
+  when: not configure_minione
+
+- name: Configurar ficheros de OpenNebula
+  ansible.builtin.import_tasks: config_oned.yml
+  when: config_oned
+
+# En obras, fichero aún con errores. Pasos para frontend HA en
+# https://docs.opennebula.io/6.6/installation_and_configuration/ha/frontend_ha.html
+# Mucha movida de entrar y salir en cada host
+
+# - name: Configuración de frontend en HA
+#   ansible.builtin.import_tasks: HA.yml
+#   when:
+#     - config_oned
+#     - not HA_result['failed']
+
+# Tengo que ver si tras la HA, todos los hosts tienen la misma clave pero imagino que sí
+- name: Enviar claves a hipervisores
+  ansible.builtin.import_tasks: pub_key.yml

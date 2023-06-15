@@ -1,0 +1,7 @@
+---
+# mysql_install.yml
+install_mysql: true
+
+# mysql_config.yml
+mysql_user: oneadmin
+mysql_password: opennebula

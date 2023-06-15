@@ -1,0 +1,5 @@
+---
+- name: Reseteo unidades fallidas de systemctl
+  ansible.builtin.command: systemctl reset-failed
+  listen: Restart failed services
+# systemd-networkd-wait-online.service a veces se queda en error

@@ -1,0 +1,17 @@
+---
+- name: Verificar presencia de HA
+  ansible.builtin.set_fact:
+    ha: "{{  (groups['frontend'] | length > 1) | default(false) }}"
+
+- name: Verificar si VIP está definida en cluster con HA
+  ansible.builtin.fail:
+    msg: "El CPD no tiene definida una VIP a pesar de estar en modo de alta disponibilidad"
+  when:
+    - vip is undefined
+    - ha
+
+- name: Establecer IP del primer/único host frontend como vip si no hay vip definida
+  ansible.builtin.set_fact:
+    vip: "{{ hostvars[groups['frontend'][0]]['ansible_host'] }}"
+  when:
+    - not ha

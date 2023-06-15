@@ -1,0 +1,37 @@
+---
+- name: Configuración del oned via terraform
+  community.general.terraform:
+    project_path: "{{ terraform_workspace }}"
+    state: "present"
+    force_init: true
+    complex_vars: true
+    variables:
+      endpoint: "http://{{ vip }}:2633/RPC2"
+      onepasswd: "{{ oneadmin_password }}"
+      hosts: "{{ groups['hipervisores'] }}"
+      ceph_pool:
+        ceph_pool: "{{ rbd_pool }}"
+        ceph_client: "{{ rbd_user }}"
+        ceph_secret: "{{ UUID }}"
+        libvirt_hosts: "{{ groups['ceph_admins'] | map('extract', hostvars, 'ansible_host') | list }}"
+        ceph_mons: "{{ groups['ceph_admins'] | map('extract', hostvars, 'cluster_ip') | join(' ') }}"
+      public_net:
+        name: "{{ extern_vnet_name }}"
+        bridge: "{{ extern_vnet_bridge }}"
+        ip4: "{{ extern_vnet_ip }}"
+        size: "{{ extern_vnet_size }}"
+        gateway: "{{ extern_vnet_gateway }}"
+        network_mask: "{{ extern_vnet_network_mask }}"
+        dns: "{{ extern_vnet_dns }}"
+        search_domain: "{{ extern_vnet_search_domain }}"
+      crear_private_net: "{{ crear_private_net }}"
+      private_net:
+        name: "{{ intern_vnet_name }}"
+        bridge: "{{ intern_vnet_bridge }}"
+        ip4: "{{ intern_vnet_ip }}"
+        size: "{{ intern_vnet_size }}"
+      crear_plantilla: "{{ crear_plantilla }}"
+      levantar_vm: "{{ levantar_vm }}"
+
+### Esto es para ver si la config es correcta
+#  check_mode: true

@@ -1,0 +1,24 @@
+---
+- name: Crear directorio de configuración para el servicio de config de iptables
+  ansible.builtin.file:
+    path: /etc/docker-forward-accept/
+    state: directory
+    mode: '0755'
+
+- name: Copiar script que el servicio va a ejecutar
+  ansible.builtin.copy:
+    src: files/default.sh
+    dest: /etc/docker-forward-accept/default.sh
+    mode: "0755"
+
+- name: Configuración de servicio para que iptables haga FORWARD ACCEPT
+  ansible.builtin.copy:
+    src: files/docker-forward-accept.service
+    dest: /etc/systemd/system/docker-forward-accept.service
+    mode: "0755"
+
+- name: Recargar systemd y habilitar el servicio
+  ansible.builtin.systemd:
+    daemon_reload: true
+    enabled: true
+    name: docker-forward-accept

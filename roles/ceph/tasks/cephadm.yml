@@ -1,0 +1,23 @@
+---
+- name: Descargar cephadm
+  ansible.builtin.get_url:
+    url: "{{ cephadm_repo }}"
+    dest: /tmp/cephadm
+    mode: '0755'
+    timeout: 30
+
+- name: Instalar cephadm
+  ansible.builtin.command: /tmp/cephadm install
+  register: ceph_cephadm_install
+  changed_when: ceph_cephadm_install.rc != 0 # Nunca cambia igualmente
+
+# Hace exactamente lo mismo que cephadm install ceph-common y además con idempotencia.
+# Ceph no tiene repositorio oficial para ubuntu jammy. Cephadm se puede descargar actualizado desde el repo porque es un script
+# pero para ceph-common, o uso los repos de apt-get o dejo que cephadm instale de donde pille.
+- name: Instalar cli de ceph
+  ansible.builtin.apt:
+    name: ceph-common
+    state: present
+  register: ceph_common_install
+  until: ceph_common_install is successful
+# NO instalo el paquete "ceph", este incluye los paquetes ceph-mon, ceph-mgr y ceph-osd y pretendo levantar estos servicios contenerizados.

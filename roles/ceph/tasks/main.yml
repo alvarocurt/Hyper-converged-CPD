@@ -1,0 +1,23 @@
+---
+- name: Añadir repositorio de ceph
+  ansible.builtin.import_tasks: ceph_repo.yml
+  when:
+    - ansible_lsb.release != '22.04'
+    - config_ceph_repo
+
+- name: Instalar cephadm
+  ansible.builtin.import_tasks: cephadm.yml
+  when: install_cephadm
+
+- name: Desplegar cluster
+  ansible.builtin.import_tasks: bootstrap.yml
+  when:
+    - bootstrap
+    - bootstrap_host == ansible_hostname
+
+- name: Ampliación y configuración de cluster
+  ansible.builtin.import_tasks: config_ceph.yml
+  when: config_ceph
+
+- name: Liquido handlers
+  ansible.builtin.meta: flush_handlers
