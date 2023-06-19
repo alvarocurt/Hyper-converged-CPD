@@ -20,6 +20,7 @@
 - name: Activar ntp en timedatectl
   ansible.builtin.command: timedatectl set-ntp true
   listen: Run Timedatectl
+  changed_when: false
 
 - name: Reiniciar Networkd
   ansible.builtin.systemd:

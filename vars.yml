@@ -26,6 +26,8 @@ mutual_ssh: true
 ### Configurar servidores NTP de los host
 config_ntp: true
 # timedatectl_timezone: Europe/Madrid
+### Servidor NTP principal, si no concreto, se usan los fallback
+# timedatectl_timeserver: ntp-server.hi.inet
 # timedatectl_timeservers_fallback: ['0.es.pool.ntp.org', '1.es.pool.ntp.org', '2.es.pool.ntp.org', '3.es.pool.ntp.org']
 
 ### Modificar fichero /etc/hosts

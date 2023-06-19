@@ -7,10 +7,6 @@
   ansible.builtin.import_tasks: mutual_ssh.yml
   when: mutual_ssh
 
-- name: Configuración NTP de los host
-  ansible.builtin.import_tasks: ntp.yml
-  when: config_ntp
-
 - name: Modificar archivo /etc/hosts
   ansible.builtin.lineinfile:
     insertafter: "127.0.1.1*"
@@ -27,6 +23,10 @@
 - name: Deshabilitar cloud.init
   ansible.builtin.import_tasks: cloud_init.yml
   when: disable_cloud_init
+
+- name: Configuración NTP de los host
+  ansible.builtin.import_tasks: ntp.yml
+  when: config_ntp
 
 - name: Añadir repositorios de opennebula enterprise
   ansible.builtin.import_tasks: opennebula_repo.yml
