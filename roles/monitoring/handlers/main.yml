@@ -12,7 +12,15 @@
 
 - name: Reiniciar y habilitar prometheus
   ansible.builtin.systemd:
-    name: opennebula-prometheus
+    name: opennebula-prometheus.service
     state: restarted
     enabled: true
   listen: Reiniciar prometheus
+
+- name: Reiniciar y habilitar alertmanager
+  ansible.builtin.systemd:
+    name: opennebula-alertmanager.service
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  listen: Reiniciar alertmanager

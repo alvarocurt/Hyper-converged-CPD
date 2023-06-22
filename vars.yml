@@ -143,7 +143,7 @@ oneadmin_password: labpassword
 config_oned: true
 
 # Definir IP flotante de la red de gestión para HA si hay más de un host frontend. Si no defino habiendo >1 frontend, salta error
-# vip: 10.95.54.35
+# vip:
 
 ########################################################################
 ###################### EXPAND_OPENNEBULA ###############################
@@ -180,4 +180,13 @@ levantar_vm: false
 ###################### MONITORING ######################################
 ########################################################################
 
-### modificar roles/monitoring/files/alertmanager.yml para establecer los endpoints
+### Despliegue de exporters de OpenNebula y Ceph
+config_one_exporters: false
+config_ceph_exporters: false
+config_prometheus: false
+config_alertmanager: true
+
+### Recomendable crear fichero roles/monitoring/files/alertmanager.yml para establecer los endpoints de las alarmas
+### Si no se adjunta un fichero de configuración, no se hacen cambios
+### El lugar default para buscar el fichero es dentro del inventory, pero se puede establecer cualquier ruta
+alertmanager_file: "{{ ansible_inventory_sources[0] }}/files/alertmanager.yml"

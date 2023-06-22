@@ -9,13 +9,13 @@
   ansible.builtin.copy:
     src: files/default.sh
     dest: /etc/docker-forward-accept/default.sh
-    mode: "0755"
+    mode: "755"
 
 - name: Configuración de servicio para que iptables haga FORWARD ACCEPT
   ansible.builtin.copy:
     src: files/docker-forward-accept.service
     dest: /etc/systemd/system/docker-forward-accept.service
-    mode: "0755"
+    mode: "755"
 
 - name: Recargar systemd y habilitar el servicio
   ansible.builtin.systemd:

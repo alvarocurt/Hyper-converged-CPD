@@ -2,6 +2,7 @@
 - name: Instalar opennebula-prometheus-kvm
   ansible.builtin.apt:
     name: opennebula-prometheus-kvm
+  notify: Reiniciar one-exporters
 
 - name: Instalar opennebula-prometheus
   ansible.builtin.apt:

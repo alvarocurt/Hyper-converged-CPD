@@ -1,5 +1,5 @@
 ---
-- name: Obtener IDs de hosts
+- name: Obtener IDs de hosts en OpenNebula
   ansible.builtin.shell:
     cmd: "set -o pipefail && onehost show {{ item }} | awk 'NR==2 {print $3}'"
     executable: /bin/bash
@@ -7,13 +7,13 @@
   changed_when: false
   loop: "{{ groups['hipervisores'] }}"
 
-- name: Crear diccionario
+- name: Crear diccionario con IDs
   ansible.builtin.set_fact:
     monitoring_host_ids: "{{ monitoring_host_ids | default({}) | combine({item.item: item.stdout}) }}"
   loop: "{{ monitoring_ids_output.results }}"
   changed_when: false
 
-- name: Creación de fichero /etc/one/prometheus/prometheus.yml
+- name: Creación de fichero /etc/one/prometheus/prometheus.yml mediante plantilla
   ansible.builtin.template:
     src: templates/prometheus.yml.j2
     dest: /etc/one/prometheus/prometheus.yml
