@@ -184,7 +184,8 @@ levantar_vm: false
 config_one_exporters: false
 config_ceph_exporters: false
 config_prometheus: false
-config_alertmanager: true
+config_alertmanager: false
+config_grafana: true
 
 ### Recomendable crear fichero roles/monitoring/files/alertmanager.yml para establecer los endpoints de las alarmas
 ### Si no se adjunta un fichero de configuración, no se hacen cambios

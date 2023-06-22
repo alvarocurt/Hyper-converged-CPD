@@ -20,3 +20,9 @@
   when:
     - config_alertmanager
     - ansible_hostname in groups['frontend']
+
+- name: Configuración de grafana
+  ansible.builtin.import_tasks: grafana.yml
+  when:
+    - config_grafana
+    - ansible_hostname in groups['frontend']

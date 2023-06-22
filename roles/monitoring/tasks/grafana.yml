@@ -1,0 +1,121 @@
+---
+- name: Añadir clave gpg de grafana
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /usr/share/keyrings/grafana.key
+    mode: '644'
+    force: true # Actualizar siempre
+
+- name: Añado repositorio oficial grafana
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main"
+    state: present
+    filename: grafana
+
+- name: Instalar grafana
+  ansible.builtin.apt:
+    name: grafana-enterprise
+    state: present
+    update_cache: true
+  register: monitoring_grafana_installed
+  until: monitoring_grafana_installed is successful
+
+- name: Fichero grafana.ini
+  ansible.builtin.copy:
+    src: files/grafana.ini
+    dest: /etc/grafana/grafana.ini
+    mode: '640'
+    group: grafana
+
+- name: Añadir plugins usados por algunos dashboards
+  community.grafana.grafana_plugin:
+    name: "{{ item }}"
+    version: latest
+    state: present
+  loop:
+    - vonage-status-panel
+    - grafana-piechart-panel
+
+### A partir de aquí puedo o usar los modulos ansible de grafana para añadir los recursos atacando la url
+### O poblar grafana con ficheros "providers" tal y como hacía en la configuración manual.
+### Voy a probar la primera
+
+- name: Arrancar grafana
+  ansible.builtin.systemd:
+    name: grafana-server.service
+    state: started
+    enabled: true
+
+- name: Añadir Datasource Prometheus
+  community.grafana.grafana_datasource:
+    name: Dashboard1
+    ds_type: prometheus
+    ds_url: http://localhost:9090
+    access: proxy
+    is_default: true
+    grafana_url: http://localhost:3000/
+    org_id: 1
+    tls_skip_verify: true
+
+- name: Buscar dashboards de OpenNebula descargados
+  ansible.builtin.find:
+    paths: /usr/share/one/grafana/dashboards/
+    file_type: file
+  register: monitoring_opennebula_dashboards
+
+- name: Crear directorios para los Dashboards en Grafana
+  community.grafana.grafana_folder:
+    url: http://localhost:3000/
+    title: "{{ item }}"
+    state: present
+  loop:
+    - "OpenNebula Dashboards"
+    - "Ceph Dashboards"
+    - "Node Exporters"
+
+- name: Importar Dashboards de OpenNebula
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000/
+    org_id: 1
+    commit_message: Dashboards de OpenNebula
+    folder: OpenNebula Dashboards
+    path: "{{ item }}"
+    overwrite: true
+  loop: "{{ monitoring_opennebula_dashboards.files | map(attribute='path') | list }}"
+
+
+# ó
+#    dashboard_id: 6098
+#    dashbord_revision: 1
+# ó
+#    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+
+
+ 
+# cat > /etc/grafana/provisioning/dashboards/ceph.yaml <<'EOF'
+# apiVersion: 1
+# providers:
+#   - name: Ceph
+#     folder: 'Ceph Dashboards'
+#     type: file
+#     updateIntervalSeconds: 30
+#     options:
+#       path: /etc/grafana/dashboards/ceph/
+# EOF
+   
+# cat > /etc/grafana/provisioning/dashboards/node-exporter.yaml <<'EOF'
+# apiVersion: 1
+# providers:
+#   - name: Node-exporter
+#     folder: 'Node-exporter'
+#     type: file
+#     updateIntervalSeconds: 30
+#     options:
+#       path: /etc/grafana/dashboards/node-exporter/
+# EOF
+
+# wget -P /etc/grafana/dashboards/ceph/ https://raw.githubusercontent.com/ceph/ceph/main/monitoring/ceph-mixin/dashboards_out/<Dashboard-name>.json
+# https://grafana.com/grafana/dashboards/2842-ceph-cluster/
+
+# mkdir -p /etc/grafana/dashboards/node-exporter/
+# wget -O /etc/grafana/dashboards/node-exporter/node-exporter.json https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json

@@ -1,6 +1,5 @@
 ansible-galaxy collection list
 
-# /Users/cxb0519/.ansible/collections/ansible_collections
 Collection        Version
 ----------------- -------
 ansible.posix     1.4.0

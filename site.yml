@@ -1,12 +1,12 @@
 ---
-# - name: Registrar fingerprints de hosts
-#   hosts: localhost
-#   vars_files:
-#     - vars.yml
-#   gather_facts: false
-#   roles:
-#     - role: fingerprints
-#       when: fingerprint_config
+- name: Registrar fingerprints de hosts
+  hosts: localhost
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  roles:
+    - role: fingerprints
+      when: fingerprint_config
 
 - name: Definir variable global
   hosts: all
@@ -15,41 +15,41 @@
     - name: Definir si el frontend tiene HA o no, y la vip a usar
       ansible.builtin.include_tasks: tasks/vip.yml
 
-# - name: Configuración común a todos los hosts
-#   hosts: all
-#   become: true
-#   vars_files:
-#     - vars.yml
-#   roles:
-#     - role: config_common
+- name: Configuración común a todos los hosts
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+  roles:
+    - role: config_common
 
-# - name: Configuración de hosts hipervisores
-#   hosts: hipervisores
-#   become: true
-#   vars_files:
-#     - vars.yml
-#   roles:
-#     - role: config_hiperv
-#     - role: ceph
-#     - role: opennebula_kvm
+- name: Configuración de hosts hipervisores
+  hosts: hipervisores
+  become: true
+  vars_files:
+    - vars.yml
+  roles:
+    - role: config_hiperv
+    - role: ceph
+    - role: opennebula_kvm
 
-# - name: Configuración de hosts frontend
-#   hosts: frontend
-#   become: true
-#   vars_files:
-#     - vars.yml
-#   roles:
-#     - role: config_frontend
-#     - role: opennebula_frontend
+- name: Configuración de hosts frontend
+  hosts: frontend
+  become: true
+  vars_files:
+    - vars.yml
+  roles:
+    - role: config_frontend
+    - role: opennebula_frontend
 
-# - name: Configuración del oned via terraform
-#   hosts: localhost
-#   vars_files:
-#     - vars.yml
-#   gather_facts: false
-#   roles:
-#     - role: expand_opennebula
-#       when: expand_opennebula
+- name: Configuración del oned via terraform
+  hosts: localhost
+  vars_files:
+    - vars.yml
+  gather_facts: false
+  roles:
+    - role: expand_opennebula
+      when: expand_opennebula
 
 - name: Implementación de herramientas de monitorización en el CPD
   hosts: all

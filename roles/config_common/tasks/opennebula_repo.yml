@@ -8,7 +8,7 @@
   until: config_common_onerepo_result is successful
 
   # El uso de apt_key está deprecated.
-- name: Añado clave firmada del repositorio
+- name: Añado clave gpg de opennebula
   ansible.builtin.get_url:
     url: https://downloads.opennebula.io/repo/repo2.key
     dest: /usr/share/keyrings/opennebula_repo2.key
