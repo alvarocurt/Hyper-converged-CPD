@@ -1,9 +1,9 @@
 # Usuario con el que acceder via ssh
 ansible_user: usuario
 # Contraseña del usuario
-ansible_ssh_pass: labpassword
+ansible_ssh_pass: contrasena
 # Contraseña con la que hacer sudo para ser root desde el usuario
-ansible_sudo_pass: labpassword
+ansible_sudo_pass: contrasena
 
 # Parámetro adicional si hay que atravesar proxy para llegar a hosts
 # ansible_ssh_common_args: -J proxy-socks

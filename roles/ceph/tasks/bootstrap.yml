@@ -1,6 +1,6 @@
 ---
 - name: Verificar si ya hay clúster de Ceph desplegado
-  ansible.builtin.stat::
+  ansible.builtin.stat:
     path: /var/lib/ceph/stat_bootstrap
   register: ceph_check_bootstrap
 
@@ -22,4 +22,4 @@
   ansible.builtin.copy:
     content: "Ceph cluster bootstrap complete."
     dest: /var/lib/ceph/stat_bootstrap
-    mode: '0644'
+    mode: '644'

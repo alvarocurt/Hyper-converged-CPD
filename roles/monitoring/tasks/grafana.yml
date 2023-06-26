@@ -38,7 +38,7 @@
 
 ### A partir de aquí puedo o usar los modulos ansible de grafana para añadir los recursos atacando la url
 ### O poblar grafana con ficheros "providers" tal y como hacía en la configuración manual.
-### Voy a probar la primera
+### Lo hago con la primera opción
 
 - name: Arrancar grafana
   ansible.builtin.systemd:
@@ -84,38 +84,44 @@
   loop: "{{ monitoring_opennebula_dashboards.files | map(attribute='path') | list }}"
 
 
-# ó
-#    dashboard_id: 6098
-#    dashbord_revision: 1
-# ó
-#    dashboard_url: https://grafana.com/api/dashboards/6098/revisions/1/download
+- name: Obtener lista de Dashboards de Ceph del repositorio oficial
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/ceph/ceph/contents/monitoring/ceph-mixin/dashboards_out"
+    method: GET
+    return_content: true
+    headers:
+      Accept: "application/vnd.github.v3+json"
+  register: monitoring_ceph_dashboards
 
+- name: Importar Dashboards de Ceph
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000/
+    org_id: 1
+    commit_message: Dashboards Oficiales de Ceph
+    folder: Ceph Dashboards
+    path: "https://raw.githubusercontent.com/ceph/ceph/main/monitoring/ceph-mixin/dashboards_out/{{ item }}"
+    overwrite: true
+  loop: "{{ monitoring_ceph_dashboards.json |
+            selectattr('type', 'equalto', 'file') |
+            map(attribute='name') |
+            select('match', '.*\\.json$') | list }}"
+  when: item != "ceph-cluster.json"
 
- 
-# cat > /etc/grafana/provisioning/dashboards/ceph.yaml <<'EOF'
-# apiVersion: 1
-# providers:
-#   - name: Ceph
-#     folder: 'Ceph Dashboards'
-#     type: file
-#     updateIntervalSeconds: 30
-#     options:
-#       path: /etc/grafana/dashboards/ceph/
-# EOF
-   
-# cat > /etc/grafana/provisioning/dashboards/node-exporter.yaml <<'EOF'
-# apiVersion: 1
-# providers:
-#   - name: Node-exporter
-#     folder: 'Node-exporter'
-#     type: file
-#     updateIntervalSeconds: 30
-#     options:
-#       path: /etc/grafana/dashboards/node-exporter/
-# EOF
+- name: Importar Dashboard de Ceph Overview
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000/
+    org_id: 1
+    commit_message: Ceph-Overview
+    folder: Ceph Dashboards
+    dashboard_id: 2842
+    dashboard_revision: 16
+    overwrite: true
 
-# wget -P /etc/grafana/dashboards/ceph/ https://raw.githubusercontent.com/ceph/ceph/main/monitoring/ceph-mixin/dashboards_out/<Dashboard-name>.json
-# https://grafana.com/grafana/dashboards/2842-ceph-cluster/
-
-# mkdir -p /etc/grafana/dashboards/node-exporter/
-# wget -O /etc/grafana/dashboards/node-exporter/node-exporter.json https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json
+- name: Importar Dashboard para los Node Exporters
+  community.grafana.grafana_dashboard:
+    grafana_url: http://localhost:3000/
+    org_id: 1
+    commit_message: Dashboard para los Node Exporters
+    folder: Node Exporters
+    path: "https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json"
+    overwrite: true
