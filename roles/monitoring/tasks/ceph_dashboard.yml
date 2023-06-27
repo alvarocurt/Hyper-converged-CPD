@@ -9,14 +9,14 @@
     monitoring_mgrs_id: "{{ monitoring_ceph_mgrs.stdout | from_json | map(attribute='daemon_id') | list }}"
     monitoring_mgrs_host: "{{ monitoring_ceph_mgrs.stdout | from_json | map(attribute='hostname') | list }}"
 
-- name: Script para configuración de los ceph-exporters
+- name: Script para configuración del Ceph Dashboard
   ansible.builtin.template:
-    src: templates/ceph_exporters.j2
-    dest: /tmp/ceph_exporters.sh
+    src: templates/ceph_dashboard.j2
+    dest: /tmp/ceph_dashboard.sh
     mode: "644"
 
-- name: Ejecución de script para configuración de los ceph-exporters
+- name: Ejecución de script para configuración del Ceph Dashboard
   ansible.builtin.command:
-    cmd: bash /tmp/ceph_exporters.sh
-  register: monitoring_ceph_exporters
-  changed_when: monitoring_ceph_exporters.stderr != "module 'prometheus' is already enabled"
+    cmd: bash /tmp/ceph_dashboard.sh
+  register: monitoring_ceph_dashboard
+  changed_when: monitoring_ceph_dashboard.stderr != "module 'dashboard' is already enabled"

@@ -26,3 +26,15 @@
   when:
     - config_grafana
     - ansible_hostname in groups['frontend']
+
+- name: Configuración del Ceph Dashboard
+  ansible.builtin.import_tasks: ceph_dashboard.yml
+  when:
+    - config_ceph_dashboard
+    - ansible_hostname == groups['ceph_admins'][0]
+
+- name: Nginx para redirección vip-dashboard
+  ansible.builtin.import_tasks: nginx.yml
+  when:
+    - config_nginx
+    - ansible_hostname in groups['frontend']

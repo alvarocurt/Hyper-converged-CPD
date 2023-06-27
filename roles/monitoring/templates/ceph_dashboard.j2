@@ -1,0 +1,10 @@
+#!/bin/bash
+ceph config set mgr mgr/dashboard/ssl false
+{% for mgr, host in monitoring_mgrs_id|zip(monitoring_mgrs_host) %}
+ceph config set mgr mgr/dashboard/{{ mgr }}/server_addr {{ hostvars[host]['ansible_host'] }}
+{% endfor %}
+echo {{ dashboard_password }} > /tmp/santoysena.txt # creo fichero con contraseña
+ceph dashboard ac-user-create --enabled {{ dashboard_admin }} -i /tmp/santoysena.txt administrator
+
+ceph dashboard set-grafana-api-url http://{{ vip }}:3000
+ceph mgr module enable dashboard

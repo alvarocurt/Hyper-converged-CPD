@@ -30,6 +30,22 @@ opennebula_dependencies:
 opennebula_repo: https://enterprise.opennebula.io/repo/6.6.1/Ubuntu/22.04
 opennebula_enterprise: false
 
+### docker.yml
+install_docker: true
+docker_dependencies:
+  - gnupg
+  - wget
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - lsb-release
+  - software-properties-common
+  - gnupg-agent
+docker_repo: https://download.docker.com/linux/ubuntu
+
+### iptables.yml
+config_iptables: false
+
 ### known_hosts.yml
 config_known_hosts: false
 public_keys:

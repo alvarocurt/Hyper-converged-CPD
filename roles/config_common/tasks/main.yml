@@ -32,6 +32,14 @@
   ansible.builtin.import_tasks: opennebula_repo.yml
   when: config_one_repo
 
+- name: Instalar Docker
+  ansible.builtin.import_tasks: docker.yml
+  when: install_docker
+
+- name: Iptables FORWARD ACCEPT
+  ansible.builtin.import_tasks: iptables.yml
+  when: config_iptables
+
 - name: Distribución de fingerprints entre hosts
   ansible.builtin.import_tasks: known_hosts.yml
   when: config_known_hosts

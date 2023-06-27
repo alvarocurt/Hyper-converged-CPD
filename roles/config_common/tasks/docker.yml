@@ -4,14 +4,14 @@
     name: "{{ docker_dependencies }}"
     state: present
     update_cache: false   # ya se hizo en config_common
-  register: config_hiperv_depen_result
-  until: config_hiperv_depen_result
+  register: config_common_docker_depen
+  until: config_common_docker_depen
 
 - name: Añado clave GPG de Docker
   ansible.builtin.get_url:
     url: "{{ docker_repo }}/gpg"
     dest: /usr/share/keyrings/docker.key
-    mode: '0644'
+    mode: "644"
     force: true # Actualizar siempre
 
 - name: Añado repositorio de Docker a apt
@@ -29,8 +29,8 @@
       - containerd.io
     state: present
     update_cache: true
-  register: config_hiperv_docker_result
-  until: config_hiperv_docker_result is successful
+  register: config_common_docker_result
+  until: config_common_docker_result is successful
 
 - name: Docker activo y enabled
   ansible.builtin.systemd:

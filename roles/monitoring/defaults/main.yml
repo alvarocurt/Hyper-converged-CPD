@@ -1,2 +1,24 @@
 ---
-# defaults file for monitoring
+### one_exporters.yml
+config_one_exporters: true
+
+### ceph_exporters.yml
+config_ceph_exporters: true
+
+### prometheus.yml
+config_prometheus: true
+
+### alertmanager.yml
+config_alertmanager: true
+alertmanager_file: "{{ ansible_inventory_sources[0] }}/files/alertmanager.yml"
+
+### grafana.yml
+config_grafana: true
+
+### ceph_dashboard.yml
+config_ceph_dashboard: true
+dashboard_admin: admin
+dashboard_password: labpassword
+
+### nginx.yml
+config_nginx: true

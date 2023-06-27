@@ -1,0 +1,45 @@
+---
+- name: Instalar pip por si acaso no está
+  ansible.builtin.apt:
+    name: python3-pip
+    update_cache: true
+
+- name: Pip install requests para usar módulos de docker
+  ansible.builtin.pip:
+    name: requests
+
+- name: Directorio para imagen nginx
+  ansible.builtin.file:
+    path: /opt/imagenes/nginx-image/
+    state: directory
+    mode: "755"
+
+- name: Configuración de nginx
+  ansible.builtin.template:
+    src: templates/nginx.conf.j2
+    dest: /opt/imagenes/nginx-image/nginx.conf
+    mode: "644"
+
+- name: Dockerfile de imagen
+  ansible.builtin.copy:
+    src: files/dockerfile
+    dest: /opt/imagenes/nginx-image/dockerfile
+    mode: "644"
+
+- name: Crear Imagen
+  community.docker.docker_image:
+    name: nginx-proxy
+    build:
+      path: /opt/imagenes/nginx-image/
+      nocache: true
+    source: build
+
+- name: Levantar contenedor
+  community.docker.docker_container:
+    name: dashboard-proxy
+    state: started
+    image: nginx-proxy
+    detach: true
+    restart_policy: "unless-stopped"
+    ports:
+      - "4200:4200"

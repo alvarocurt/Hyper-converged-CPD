@@ -8,7 +8,6 @@
 ### Guardar fingerprint de hosts para poder hacer ssh en ellos en caso de no haber ssh en ellos anteriormente
 fingerprint_config: false
 
-
 ########################################################################
 ###################### CONFIG_COMMON ###################################
 ########################################################################
@@ -47,11 +46,16 @@ config_one_repo: true
 # Credenciales en /common_repos/files/opennebula.conf
 opennebula_enterprise: false
 
+### Instalación de Docker
+install_docker: true
+# docker_repo: https://download.docker.com/linux/ubuntu
+
+### Servicio para poner la cadena FORWARD a ACCEPT de nuevo tras instalar docker
+config_iptables: false
 
 ### Fichero .ssh/known_hosts común en todos los hosts. Puede evitar posibles prompts conflictivos pidiendo fingerprints
 ### No usar, estoy 95% seguro de que está mal
 config_known_hosts: false
-
 
 ########################################################################
 ###################### CONFIG_HIPERV ###################################
@@ -59,14 +63,6 @@ config_known_hosts: false
 
 ### Purgado de dispositivos de almacenamiento que van a ser empleados para Ceph
 config_devices: false
-
-### Instalación de Docker
-install_docker: true
-# docker_repo: https://download.docker.com/linux/ubuntu
-
-### Servicio para poner la cadena FORWARD a ACCEPT de nuevo tras instalar docker
-config_iptables: true
-
 
 ########################################################################
 ###################### CEPH ############################################
@@ -101,7 +97,6 @@ ceph_commands: true
 rbd_pool: onepool
 rbd_user: oneclient
 
-
 ########################################################################
 ###################### OPENNEBULA_KVM ##################################
 ########################################################################
@@ -113,7 +108,6 @@ install_kvm: true
 config_libvirt: true
 ### Universally Unique IDentifier (UUID) gnerado con uuidgen. Lo meto aquí para que sea el mismo en todos los hosts
 UUID: f3a9bc96-cca0-4bea-be80-a00a4aabc3ad
-
 
 ########################################################################
 ###################### CONFIG_FRONTEND #################################
@@ -137,7 +131,6 @@ mysql_password: sqlpassword
 # solo_front: false
 # token: 1dc0be4b:_7w2x722
 oneadmin_password: labpassword
-  # checkov:skip=CKV_SECRET_6: ADD REASON
 
 ### Para hacer la configuración de los ficheros de oned
 config_oned: true
@@ -152,25 +145,25 @@ config_oned: true
 ### Para configurar el opennebula con terraform
 ### El entorno de ejecución de ansible debe tener acceso a la herramienta terraform!!
 expand_opennebula: true
-terraform_workspace: "terraform_workspace/"
+terraform_workspace: terraform_workspace/
 
 ### Configuración de vnet
-extern_vnet_name: "management"
-extern_vnet_bridge: "br_srv"
-extern_vnet_ip: "10.100.200.100"
-extern_vnet_size: "20"
-extern_vnet_gateway: "10.95.54.1"
-extern_vnet_network_mask: "255.255.255.0"
-extern_vnet_dns: "10.95.121.180 10.95.121.189"
-extern_vnet_search_domain: "hi.inet"
+extern_vnet_name: management
+extern_vnet_bridge: br_srv
+extern_vnet_ip: 10.100.200.100
+extern_vnet_size: 20
+extern_vnet_gateway: 10.95.54.1
+extern_vnet_network_mask: 255.255.255.0
+extern_vnet_dns: 10.95.121.180 10.95.121.189
+extern_vnet_search_domain: hi.inet
 
 crear_private_net: true
 
 ### Configuración de vnet privada de incluírla
-intern_vnet_name: "service"
-intern_vnet_bridge: "br_srv"
-intern_vnet_ip: "10.100.200.100"
-intern_vnet_size: "20"
+intern_vnet_name: service
+intern_vnet_bridge: br_srv
+intern_vnet_ip: 10.100.200.100
+intern_vnet_size: 20
 
 ### La configuración de la vm, la plantilla y su imagen se hacen directamente sobre los ficheros de terraform
 crear_plantilla: true
@@ -180,14 +173,20 @@ levantar_vm: false
 ###################### MONITORING ######################################
 ########################################################################
 
-### Despliegue de exporters de OpenNebula y Ceph
-config_one_exporters: false
-config_ceph_exporters: false
-config_prometheus: false
-config_alertmanager: false
+### Despliegue de stack de monitorización. Pasos:
+config_one_exporters: true
+config_ceph_exporters: true
+config_prometheus: true
+config_alertmanager: true
 config_grafana: true
+config_ceph_dashboard: true
+config_nginx: true
 
 ### Recomendable crear fichero roles/monitoring/files/alertmanager.yml para establecer los endpoints de las alarmas
 ### Si no se adjunta un fichero de configuración, no se hacen cambios
 ### El lugar default para buscar el fichero es dentro del inventory, pero se puede establecer cualquier ruta
-alertmanager_file: "{{ ansible_inventory_sources[0] }}/files/alertmanager.yml"
+# alertmanager_file: "{{ ansible_inventory_sources[0] }}/files/alertmanager.yml"
+
+### Credenciales para el dashboard de Ceph
+dashboard_admin: admin
+dashboard_password: labpassword   # "admin" no deja por ser demasiado floja

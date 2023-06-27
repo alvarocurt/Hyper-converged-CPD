@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: /etc/docker-forward-accept/
     state: directory
-    mode: '0755'
+    mode: "755"
 
 - name: Copiar script que el servicio va a ejecutar
   ansible.builtin.copy:

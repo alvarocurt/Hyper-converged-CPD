@@ -3,8 +3,10 @@
   ansible.builtin.copy:
     src: "{{ alertmanager_file }}"
     dest: /etc/one/alertmanager/alertmanager.yml
-    mode: '644'
+    mode: "644"
     group: oneadmin
+  # si el fichero no existe, el módulo falla, pero la ejecución sigue
+  ignore_errors: true
   notify: Reiniciar alertmanager
 
 - name: Alertmanager en HA
@@ -14,11 +16,11 @@
       ansible.builtin.file:
         path: /etc/systemd/system/opennebula-alertmanager.service.d/
         state: directory
-        mode: '755'
+        mode: "755"
 
     - name: Modifico servicio opennebula-alertmanager para usar HA
       ansible.builtin.template:
         src: templates/alertmanager.svc.j2
         dest: /etc/systemd/system/opennebula-alertmanager.service.d/override.conf
-        mode: '644'
+        mode: "644"
       notify: Reiniciar alertmanager
