@@ -5,8 +5,13 @@ ansible_ssh_pass: contrasena
 # Contraseña con la que hacer sudo para ser root desde el usuario
 ansible_sudo_pass: contrasena
 
-# Parámetro adicional si hay que atravesar proxy para llegar a hosts
-# ansible_ssh_common_args: -J proxy-socks
+# Definir IP flotante de la red de gestión para HA si hay más de un host frontend. Si no defino habiendo >1 frontend, salta error
+# vip:
+
+# Parámetros adicionales si hay que atravesar proxy para llegar a hosts
+# proxy: proxy-socks
+# ansible_ssh_common_args: -J {{ proxy }}
+# ansible_ssh_private_key_file: /root/.ssh/private_key/id_rsa
 
 ### Credenciales de OpenNebula Enterprise Edition de tenerlas (poner también variable opennebula_enterprise a true)
 one_EE_login: loginlogin

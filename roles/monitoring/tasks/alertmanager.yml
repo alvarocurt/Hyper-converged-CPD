@@ -24,3 +24,6 @@
         dest: /etc/systemd/system/opennebula-alertmanager.service.d/override.conf
         mode: "644"
       notify: Reiniciar alertmanager
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

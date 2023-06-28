@@ -12,3 +12,6 @@
   notify:
     - Restart Timesyncd
     - Run Timedatectl
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

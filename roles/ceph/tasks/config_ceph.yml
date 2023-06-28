@@ -20,6 +20,8 @@
       ansible.builtin.command:
         cmd: ceph orch apply -i /tmp/host_specs.yml
       when: bootstrap_host == ansible_hostname
+      ### Probar a hacer con https://docs.ansible.com/ansible/latest/collections/ansible/builtin/script_module.html
+      ### Argumentos create para idempotencia, y executable para el "ceph orch apply -i"
 
     - name: Compartir el fichero ceph.conf entre todos los hosts hipervisores
       ansible.builtin.copy:
@@ -52,7 +54,7 @@
   when: ansible_hostname == bootstrap_host
 
 - name: Creación de pool rbd y cliente rbd
-  ansible.builtin.command: bash /tmp/comandos.sh
+  ansible.builtin.script: /tmp/comandos.sh
   when:
     - ansible_hostname == bootstrap_host
     - ceph_commands
@@ -67,3 +69,6 @@
     mode: '0644'
   notify:
     - Restart failed services
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

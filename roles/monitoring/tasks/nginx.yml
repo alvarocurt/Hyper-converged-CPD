@@ -14,6 +14,10 @@
     state: directory
     mode: "755"
 
+- name: Asignar un admin ceph aleatorio a cada host
+  ansible.builtin.set_fact:
+    monitoring_random_index: "{{ range(0, groups['ceph_admins'] | length) | random(seed=inventory_hostname) }}"
+
 - name: Configuración de nginx
   ansible.builtin.template:
     src: templates/nginx.conf.j2

@@ -15,3 +15,6 @@
     dest: /usr/lib/one/opennebula_exporter/opennebula_vm_collector.rb
     mode: '644'
   notify: Reiniciar one-exporters
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

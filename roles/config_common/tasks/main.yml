@@ -40,9 +40,5 @@
   ansible.builtin.import_tasks: iptables.yml
   when: config_iptables
 
-- name: Distribución de fingerprints entre hosts
-  ansible.builtin.import_tasks: known_hosts.yml
-  when: config_known_hosts
-
 - name: Activo handlers
   ansible.builtin.meta: flush_handlers

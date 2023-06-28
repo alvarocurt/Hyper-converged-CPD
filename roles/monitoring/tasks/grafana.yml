@@ -57,12 +57,6 @@
     org_id: 1
     tls_skip_verify: true
 
-- name: Buscar dashboards de OpenNebula descargados
-  ansible.builtin.find:
-    paths: /usr/share/one/grafana/dashboards/
-    file_type: file
-  register: monitoring_opennebula_dashboards
-
 - name: Crear directorios para los Dashboards en Grafana
   community.grafana.grafana_folder:
     url: http://localhost:3000/
@@ -72,6 +66,19 @@
     - "OpenNebula Dashboards"
     - "Ceph Dashboards"
     - "Node Exporters"
+
+- name: Buscar dashboards de OpenNebula descargados
+  ansible.builtin.find:
+    paths: /usr/share/one/grafana/dashboards/
+    file_type: file
+  register: monitoring_opennebula_dashboards
+
+- name: Modifico URL hacia Sunstone de los dashboard
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    regexp: \"url\":.*
+    line: "      \"url\": \"http://{{ vip }}:9869/#vms-tab/${one_vm_id}\""
+  loop: "{{ monitoring_opennebula_dashboards.files | map(attribute='path') | list }}"
 
 - name: Importar Dashboards de OpenNebula
   community.grafana.grafana_dashboard:

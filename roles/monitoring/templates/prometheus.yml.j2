@@ -49,6 +49,6 @@ scrape_configs:
   honor_labels: true
   static_configs:
   - targets:
-{% for host in groups['hipervisores'] %}
+{% for host in groups['ceph_admins'] %}
     - {{ host }}:9283
 {% endfor %}

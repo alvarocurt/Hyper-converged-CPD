@@ -1,7 +1,12 @@
 #!/bin/bash
+# Que cephadm gestione la actualización y reparto de /etc/ceph.conf
+ceph config set mgr mgr/cephadm/manage_etc_ceph_ceph_conf true
+
 # Pools
 ceph osd pool create {{ rbd_pool }} --bulk
 rbd pool init {{ rbd_pool }}
 
 # Users
-ceph auth get-or-create client.{{ rbd_user }} mon 'profile rbd' osd 'profile rbd pool={{ rbd_pool }}'
+ceph auth get-or-create client.{{ rbd_user }} mon 'profile rbd' mgr 'profile rbd' osd 'profile rbd pool={{ rbd_pool }}'
+# https://docs.ceph.com/en/latest/rados/operations/user-management/
+# ceph auth add o get-or-create-key hacen lo mismo para este caso

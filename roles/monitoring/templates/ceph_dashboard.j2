@@ -1,5 +1,6 @@
 #!/bin/bash
 ceph config set mgr mgr/dashboard/ssl false
+ceph config rm mgr mgr/dashboard/ssl_server_port
 {% for mgr, host in monitoring_mgrs_id|zip(monitoring_mgrs_host) %}
 ceph config set mgr mgr/dashboard/{{ mgr }}/server_addr {{ hostvars[host]['ansible_host'] }}
 {% endfor %}

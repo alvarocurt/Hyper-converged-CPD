@@ -7,13 +7,22 @@
 
 - name: Obtener fingerprints de hosts
   ansible.builtin.command: "ssh-keyscan {{ hostvars[item].ansible_host }}"
-  register: fingerprints
-  changed_when: fingerprints.rc != 0
+  register: fingerprints_list
+  changed_when: fingerprints_list.rc != 0
   loop: "{{ hostvars.keys() | list }}"
+  when: proxy is not defined
+
+- name: Obtener fingerprints de hosts
+  ansible.builtin.command: "ssh {{ proxy }} ssh-keyscan {{ hostvars[item].ansible_host }}"
+  register: fingerprints_list
+  changed_when: fingerprints_list.rc != 0
+  loop: "{{ hostvars.keys() | list }}"
+  when: proxy is defined
+
 
 - name: Registrar fingerprints en ~/.ssh/known_hosts
   ansible.builtin.known_hosts:
     name: "{{ hostvars[item.item].ansible_host }}"
     key: "{{ item.stdout }}"
     state: present
-  loop: "{{ fingerprints.results }}"
+  loop: "{{ fingerprints_list.results }}"

@@ -1,5 +1,6 @@
 ### Variables en orden de aparición en la ejecución del playbook
 ### Todos los opcionales en false por defecto. Ir activando pasos extra deseados
+### Se incluye la posibilidad de deshabilitar pasos obligatorios para debug
 
 ########################################################################
 ###################### FINGERPRINTS ####################################
@@ -52,10 +53,6 @@ install_docker: true
 
 ### Servicio para poner la cadena FORWARD a ACCEPT de nuevo tras instalar docker
 config_iptables: false
-
-### Fichero .ssh/known_hosts común en todos los hosts. Puede evitar posibles prompts conflictivos pidiendo fingerprints
-### No usar, estoy 95% seguro de que está mal
-config_known_hosts: false
 
 ########################################################################
 ###################### CONFIG_HIPERV ###################################
@@ -135,9 +132,6 @@ oneadmin_password: labpassword
 ### Para hacer la configuración de los ficheros de oned
 config_oned: true
 
-# Definir IP flotante de la red de gestión para HA si hay más de un host frontend. Si no defino habiendo >1 frontend, salta error
-# vip:
-
 ########################################################################
 ###################### EXPAND_OPENNEBULA ###############################
 ########################################################################
@@ -188,5 +182,5 @@ config_nginx: true
 # alertmanager_file: "{{ ansible_inventory_sources[0] }}/files/alertmanager.yml"
 
 ### Credenciales para el dashboard de Ceph
-dashboard_admin: admin
-dashboard_password: labpassword   # "admin" no deja por ser demasiado floja
+# dashboard_admin: admin
+# dashboard_password: labpassword   # "admin" no deja por ser demasiado floja

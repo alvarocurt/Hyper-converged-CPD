@@ -1,14 +1,4 @@
 ---
-- name: Copio el fichero known_hosts al .ssh de oneadmin
-  ansible.builtin.copy:
-    src: /root/.ssh/known_hosts
-    dest: /var/lib/one/.ssh/known_hosts
-    owner: oneadmin
-    group: oneadmin
-    mode: '644'
-    remote_src: true
-  when: config_known_hosts
-
 - name: Agregar clave pública de oneadmin al resto de hosts
   ansible.posix.authorized_key:
     user: oneadmin

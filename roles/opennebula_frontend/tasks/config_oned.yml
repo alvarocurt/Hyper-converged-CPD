@@ -48,3 +48,6 @@
     state: started
     enabled: true
   loop: "{{ servicios_opennebula }}"
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

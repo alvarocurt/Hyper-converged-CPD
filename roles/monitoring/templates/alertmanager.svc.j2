@@ -4,7 +4,7 @@ ExecStart=/usr/bin/alertmanager \
           --config.file=/etc/one/alertmanager/alertmanager.yml \
           --storage.path=/var/lib/alertmanager/data/ \
 {% for host in groups['frontend'] %}
-  {% if host != inventory_hostname %}
-          --cluster.peer={{ hostvars[host]['ansible_host'] }}:9094 {% if not loop.last %} \{% endif %}
-  {% endif %}
+{% if host != inventory_hostname %}
+          --cluster.peer={{ hostvars[host]['ansible_host'] }}:9094{% if not loop.last %} \{{ "\n" }}{% endif %}
+{% endif %}
 {% endfor %}

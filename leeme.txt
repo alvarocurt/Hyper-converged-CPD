@@ -15,7 +15,10 @@ Funcionalidades futuras:
 - autentificación de otra forma en la primera conexión https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html
 - configuración extra en devices. Posibilidad de juntarlos en LVM
 - security.yml   añadir configuración a apparmor
-- seguir con el monitoring
+- automatizar gestión de keyrings con ceph_admins
+https://docs.ceph.com/en/quincy/cephadm/operations/#client-keyrings-and-configs
+https://docs.ceph.com/en/latest/rados/operations/user-management/
+
 
 https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse.html#playbooks-reuse
 https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html#playbooks-prompts

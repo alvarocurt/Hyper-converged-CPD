@@ -42,3 +42,6 @@
   ansible.builtin.file:
     path: /etc/one/prometheus/rules.yml
     state: absent
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

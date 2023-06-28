@@ -4,21 +4,22 @@
     content: |
       "{{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get-key client.' + rbd_user) }}"
     dest: "/var/lib/one/client.{{ rbd_user }}.key"
-    mode: '0644'
+    mode: "644"
 
 - name: Compartir el fichero de autenticación de usuario ceph en todos los hosts hipervisores
   ansible.builtin.copy:
     content: |
       "{{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get client.' + rbd_user) }}"
     dest: /etc/ceph/ceph.client.{{ rbd_user }}.keyring
-    mode: '644'
+    mode: "644"
 
 - name: Mando script a hosts
   ansible.builtin.template:
     src: script.j2
     dest: /tmp/secret_config.sh
-    mode: '644'
+    mode: "644"
 
+  ### Probar con módulo script
 - name: Script de creación de secreto en libvirt
   ansible.builtin.shell:
     cmd: bash /tmp/secret_config.sh

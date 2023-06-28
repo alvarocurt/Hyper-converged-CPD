@@ -45,11 +45,3 @@ docker_repo: https://download.docker.com/linux/ubuntu
 
 ### iptables.yml
 config_iptables: false
-
-### known_hosts.yml
-config_known_hosts: false
-public_keys:
-  - ssh-dss
-  - ssh-rsa
-  - ecdsa-sha2-nistp256
-  - ssh-ed25519
