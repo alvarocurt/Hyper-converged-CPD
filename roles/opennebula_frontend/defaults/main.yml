@@ -33,4 +33,5 @@ servicios_opennebula:
   - opennebula-gate
   - opennebula-flow
 
+keep_empty_bridge: false
 ### HA.yml

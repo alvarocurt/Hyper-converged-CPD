@@ -8,7 +8,7 @@
 
 - name: Verificar estado de los dispositivos
   ansible.builtin.command: "smartctl -H {{ item }}"
-  loop: "{{ storage_devices }}"
+  loop: "{{ OSD_storage_devices | map('split', ',') | flatten }}"
   register: config_hiperv_disk_status
   changed_when: false
   failed_when: config_hiperv_disk_status.stderr != ""
@@ -17,14 +17,14 @@
   ansible.posix.mount:
     path: "{{ item }}"
     state: unmounted
-  loop: "{{ storage_devices }}"
+  loop: "{{ OSD_storage_devices | map('split', ',') | flatten }}"
 
 # Esto elimina particiones, lvm y todo lo que se menee
 - name: Eliminar firmas dispositivos
   ansible.builtin.command: "wipefs -af {{ item }}"
-  loop: "{{ storage_devices }}"
-  register: config_hiperv_delete_fs_status
-  failed_when: config_hiperv_delete_fs_status.rc > 0
+  loop: "{{ OSD_storage_devices | map('split', ',') | flatten }}"
+  register: config_hiperv_del_fs
+  failed_when: config_hiperv_del_fs.rc > 0
   changed_when: '"bytes were erased" in config_hiperv_del_fs.stdout'
 
 # Cuando no es posible hacer pvremove debido a metadatos lvm. Los elimino de dmsetup
@@ -32,7 +32,7 @@
   ansible.builtin.shell: set -o pipefail && lsblk -no NAME {{ item }} | grep -o 'ceph.*'
   args:
     executable: /bin/bash
-  loop: "{{ storage_devices }}"
+  loop: "{{ OSD_storage_devices | map('split', ',') | flatten }}"
   register: config_hiperv_ceph_lvm_status
   changed_when: false
   failed_when: config_hiperv_ceph_lvm_status.rc != 0 and config_hiperv_ceph_lvm_status.stderr | default('') != ''
@@ -44,9 +44,20 @@
   register: config_hiperv_delete_lvm_status
   changed_when: config_hiperv_delete_lvm_status.rc != 0
 
-### Posibilidad de meter aquí módulos para crear LVs con los devices recién formateados.
-### Pero no se como preguntaría por las variables
+- name: Crear grupo de volumen lógico
+  ansible.builtin.lvg:
+    vg: "ceph_vg_{{ index }}"
+    pvs: "{{ item }}"
+    pvresize: true
+  loop: "{{ OSD_storage_devices }}"
+  loop_control:
+    index_var: index
 
-# es hacer pvcreate a los vol logicos
-# modulo lvg que itere con dos variables: una con nombre del lvg y otra que indique el/los devices a usar
-# modulo lvol que itere los vg creados y cree volumen lógico con el 100% de almacenamiento.
+- name: Crear volumen lógico para cada VG
+  ansible.builtin.lvol:
+    vg: "ceph_vg_{{ index }}"
+    lv: "ceph_lv_{{ index }}"
+    size: +100%FREE
+  loop: "{{ OSD_storage_devices }}"
+  loop_control:
+    index_var: index

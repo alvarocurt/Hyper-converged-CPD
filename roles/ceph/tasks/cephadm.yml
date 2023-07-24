@@ -3,7 +3,7 @@
   ansible.builtin.get_url:
     url: "{{ cephadm_repo }}"
     dest: /tmp/cephadm
-    mode: '0755'
+    mode: "755"
     timeout: 30
 
 - name: Instalar cephadm

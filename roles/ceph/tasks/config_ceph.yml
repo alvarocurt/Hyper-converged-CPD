@@ -28,7 +28,7 @@
         content: |
           {{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' cat /etc/ceph/ceph.conf') }}
         dest: "/etc/ceph/ceph.conf"
-        mode: '644'
+        mode: "644"
       when: ansible_hostname not in groups['ceph_admins']
 
 
@@ -36,7 +36,7 @@
   ansible.builtin.template:
     src: service_specs.j2
     dest: /tmp/orch_specs.yml
-    mode: '644'
+    mode: "644"
   when: ansible_hostname == bootstrap_host
 
 - name: Configurar daemons del cluster
@@ -50,11 +50,11 @@
   ansible.builtin.template:
     src: comandos_ceph.j2
     dest: /tmp/comandos.sh
-    mode: '644'
+    mode: "644"
   when: ansible_hostname == bootstrap_host
 
 - name: Creación de pool rbd y cliente rbd
-  ansible.builtin.script: /tmp/comandos.sh
+  ansible.builtin.command: bash /tmp/comandos.sh
   when:
     - ansible_hostname == bootstrap_host
     - ceph_commands
@@ -66,7 +66,7 @@
       # fichero en blanco ya que hace conflicto con el logrotate de ceph-common
       # ceph-common es más completo
     dest: /etc/logrotate.d/cephadm
-    mode: '0644'
+    mode: "644"
   notify:
     - Restart failed services
 

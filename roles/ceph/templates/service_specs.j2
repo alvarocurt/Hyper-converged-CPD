@@ -14,7 +14,7 @@ placement:
   label: _admin
 ---
 {% for host in groups['hipervisores'] %}
-{% if hostvars[host].storage_devices is defined %}
+{% if hostvars[host].OSD_storage_devices is defined %}
 service_type: osd
 service_id: osd_spec_{{ host}}
 placement: 
@@ -23,9 +23,9 @@ placement:
 spec:
   data_devices:
     paths:
-{% for device in hostvars[host]['storage_devices'] %}
-      - {{ device }}
-{% endfor%}
+{% for i in range(OSD_storage_devices|length) %}
+      - /dev/ceph_vg_{{ i }}/ceph_lv_{{ i }}
+{% endfor %}
 ---
 {% endif %}
 {% endfor %}

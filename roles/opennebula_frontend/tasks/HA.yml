@@ -1,21 +1,59 @@
 ---
+- name: Configurar oned (RAFT_LEADER_HOOK)
+  ansible.builtin.replace:
+    path: /etc/one/oned.conf
+    after: "{{ item.after | default(omit) }}"
+    regexp: "{{ item.regexp | default(omit) }}"
+    before: "{{ item.before | default(omit) }}"
+    replace: "{{ item.replace | default(omit) }}"
+  loop:
+    - regexp: '^# *(RAFT_LEADER_HOOK *=.*)$'
+      replace: '\g<1>'
+    # NOTE: \s     <- matches also newlines
+    #       .      <- does *not* match newlines
+    #       [\S\s] <- matches anything (including newlines)
+    - after: '\nRAFT_LEADER_HOOK *= *\[' # find the start
+      regexp: '^[\S\s]*$'                # match anything in between
+      before: '\] *\n'                   # find the end
+      replace: |-
+        \n
+        COMMAND   = "raft/vip.sh",
+        ARGUMENTS = "leader {{ one_vip_if }} {{ one_vip }}/{{ one_vip_cidr }}"
+  notify:
+    - Reiniciar oned
+
+- name: Configurar monitord (MONITOR_ADDRESS)
+  ansible.builtin.replace:
+    path: /etc/one/monitord.conf
+    after: '\nNETWORK *= *\['                  # find the start
+    regexp: 'MONITOR_ADDRESS( *)= *.*([,\s])$' # match the option
+    before: '\] *\n'                           # find the end
+    replace: >-
+      MONITOR_ADDRESS\g<1>= "{{ vip }}"\g<2>
+  notify:
+    - Reiniciar oned
+
 - name: Tareas del primer host de la zona de HA
   when: ansible_hostname == groups['frontend'][0]
   block:
-    - name: Añadir el primer host a la zona 0 de OpenNebula
-      ansible.builtin.shell: "echo 'onezone server-add 0 --name {{ ansible_hostname }} --rpc http://{{ ansible_host }}:2633/RPC2' >> /root/comando"
-
-    - name: Detener servicio OpenNebula en el primer host
+    - name: Arrancar servicio OpenNebula en el primer host
       ansible.builtin.service:
         name: opennebula
-        state: stopped
+        state: started
+
+    - name: Añadir el primer host a la zona 0 de OpenNebula
+      ansible.builtin.shell:
+        cmd: "onezone server-add 0 --name {{ ansible_hostname }} --rpc http://{{ ansible_host }}:2633/RPC2"
+        executable: /bin/bash
 
     - name: Cambiar el SERVER_ID del primer host dentro de la zona
       ansible.builtin.lineinfile:
         path: /etc/one/oned.conf
         regexp: \s*SERVER_ID\s*=.*
         line: "    SERVER_ID     = 0,"
+
 # mover a default vars pero de una vamos. Sustituir eth0 por la br_mgmt, otro reto
+# Esto no se hace aquí en lo de ruben
     - name: Habilitar hooks de IP flotante en el primer host
       ansible.builtin.blockinfile:
         path: /etc/one/oned.conf
@@ -36,7 +74,11 @@
     - name: Volver a arrancar OpenNebula en el primer host
       ansible.builtin.service:
         name: opennebula
-        state: started
+        state: restarted
+
+
+# Hace cosas muy raras aquí. Paso
+
 
     # shell: onedb backup -u {userdb} -p {passwordb} -d opennebula
 

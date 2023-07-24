@@ -42,6 +42,12 @@
     line: ":public_fireedge_endpoint: http://{{ vip }}:2616"
   notify: Reiniciar oned
 
+- name: Hacer que los bridges que OpenNebula cree no se borren si quedan vacíos
+  ansible.builtin.lineinfile:
+    path: /var/lib/one/remotes/etc/vnm/OpenNebulaNetwork.conf
+    regexp: '^:keep_empty_bridge:.*$'
+    line: ':keep_empty_bridge: {{ "true" if keep_empty_bridge | bool is true else "false" }}'
+
 - name: Arranco servicios OpenNebula y enabled
   ansible.builtin.service:
     name: "{{ item }}"

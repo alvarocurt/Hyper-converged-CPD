@@ -25,7 +25,7 @@
 # los escribe en /etc/apt/sources.list.d Lo mismo que comando apt-add-repository
 - name: Añado repositorios oficiales opennebula
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/opennebula_repo2.key] {{ opennebula_repo }} stable opennebula"
+    repo: "deb [signed-by=/usr/share/keyrings/opennebula_repo2.key] {{ one_repo if not one_enterprise else one_repo_enterprise }} stable opennebula"
     state: present
     filename: opennebula
     update_cache: true

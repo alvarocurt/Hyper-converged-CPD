@@ -27,8 +27,9 @@ opennebula_dependencies:
   - gnupg
   - wget
   - apt-transport-https
-opennebula_repo: https://enterprise.opennebula.io/repo/6.6.1/Ubuntu/22.04
-opennebula_enterprise: false
+one_repo: https://downloads.opennebula.io/repo/6.6/Ubuntu/22.04
+one_repo_enterprise: https://enterprise.opennebula.io/repo/6.6.1/Ubuntu/22.04
+one_enterprise: false
 
 ### docker.yml
 install_docker: true

@@ -18,7 +18,7 @@
   listen: Restart Timesyncd
 
 - name: Activar ntp en timedatectl
-  ansible.builtin.command: timedatectl set-ntp true
+  ansible.builtin.command: timedatectl set-ntp false; timedatectl set-ntp true
   listen: Run Timedatectl
   changed_when: false
 

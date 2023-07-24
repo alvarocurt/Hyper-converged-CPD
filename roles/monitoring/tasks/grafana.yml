@@ -46,6 +46,15 @@
     state: started
     enabled: true
 
+- name: Esperar a que la API de Grafana esté disponible
+  ansible.builtin.uri:
+    url: http://localhost:3000/
+    method: GET
+  register: monitoring_grafana_up
+  until: monitoring_grafana_up.status == 200
+  retries: 10
+  delay: 10
+
 - name: Añadir Datasource Prometheus
   community.grafana.grafana_datasource:
     name: Dashboard1
@@ -113,6 +122,10 @@
             map(attribute='name') |
             select('match', '.*\\.json$') | list }}"
   when: item != "ceph-cluster.json"
+  register: monitoring_ceph_dashboards_imported
+  until: monitoring_ceph_dashboards_imported is success
+  retries: 5
+  delay: 10
 
 - name: Importar Dashboard de Ceph Overview
   community.grafana.grafana_dashboard:
@@ -123,6 +136,10 @@
     dashboard_id: 2842
     dashboard_revision: 16
     overwrite: true
+  register: monitoring_ceph_overview_imported
+  until: monitoring_ceph_overview_imported is success
+  retries: 5
+  delay: 10
 
 - name: Importar Dashboard para los Node Exporters
   community.grafana.grafana_dashboard:
@@ -132,3 +149,7 @@
     folder: Node Exporters
     path: "https://raw.githubusercontent.com/rfmoz/grafana-dashboards/master/prometheus/node-exporter-full.json"
     overwrite: true
+  register: monitoring_node_exporters_imported
+  until: monitoring_node_exporters_imported is success
+  retries: 5
+  delay: 10

@@ -2,6 +2,9 @@
 # Que cephadm gestione la actualización y reparto de /etc/ceph.conf
 ceph config set mgr mgr/cephadm/manage_etc_ceph_ceph_conf true
 
+# Clock skew no tan estricto. Máximo una décima de segundo en vez de media
+ceph config set mon mon_clock_drift_allowed 0.1
+
 # Pools
 ceph osd pool create {{ rbd_pool }} --bulk
 rbd pool init {{ rbd_pool }}

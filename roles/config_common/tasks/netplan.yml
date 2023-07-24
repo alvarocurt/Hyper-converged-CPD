@@ -21,7 +21,8 @@
 - name: Netplan apply
   ansible.builtin.command: netplan apply
   notify: Reiniciar Networkd
-  changed_when: salida.rc != 0
+  register: config_common_netplan_result
+  changed_when: config_common_netplan_result.rc != 0
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

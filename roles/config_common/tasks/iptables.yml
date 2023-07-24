@@ -21,4 +21,5 @@
   ansible.builtin.systemd:
     daemon_reload: true
     enabled: true
+    state: restarted
     name: docker-forward-accept

@@ -11,6 +11,6 @@ host-05
 [hipervisores:children]
 ceph_admins
 
-### Hosts para el frontend de OpenNebula (impares, mínimo 3). Pueden coincidir con algunos de los hipervisores o no.
+### Hosts para el frontend de OpenNebula (impares, mínimo 3). Pueden coincidir con algunos de los hipervisores o no
 [frontend]    
 host-[01:03]

@@ -5,24 +5,35 @@
     state: absent
   loop: "{{ hostvars.keys() | list }}"
 
-- name: Obtener fingerprints de hosts
-  ansible.builtin.command: "ssh-keyscan {{ hostvars[item].ansible_host }}"
-  register: fingerprints_list
-  changed_when: fingerprints_list.rc != 0
-  loop: "{{ hostvars.keys() | list }}"
+- name: Sin proxy
   when: proxy is not defined
+  block:
+    - name: Obtener fingerprints de hosts
+      ansible.builtin.command: "ssh-keyscan {{ hostvars[item].ansible_host }}"
+      register: fingerprints_output
+      changed_when: fingerprints_output.rc != 0
+      loop: "{{ hostvars.keys() | list }}"
 
-- name: Obtener fingerprints de hosts
-  ansible.builtin.command: "ssh {{ proxy }} ssh-keyscan {{ hostvars[item].ansible_host }}"
-  register: fingerprints_list
-  changed_when: fingerprints_list.rc != 0
-  loop: "{{ hostvars.keys() | list }}"
+    - name: Establecer variable
+      ansible.builtin.set_fact:
+        fingerprints_list: "{{ fingerprints_output.results }}"
+
+- name: Con proxy
   when: proxy is defined
+  block:
+    - name: Obtener fingerprints de hosts
+      ansible.builtin.command: "ssh {{ proxy }} ssh-keyscan {{ hostvars[item].ansible_host }}"
+      register: fingerprints_output
+      changed_when: fingerprints_output.rc != 0
+      loop: "{{ hostvars.keys() | list }}"
 
+    - name: Establecer variable
+      ansible.builtin.set_fact:
+        fingerprints_list: "{{ fingerprints_output.results }}"
 
 - name: Registrar fingerprints en ~/.ssh/known_hosts
   ansible.builtin.known_hosts:
     name: "{{ hostvars[item.item].ansible_host }}"
     key: "{{ item.stdout }}"
     state: present
-  loop: "{{ fingerprints_list.results }}"
+  loop: "{{ fingerprints_list }}"

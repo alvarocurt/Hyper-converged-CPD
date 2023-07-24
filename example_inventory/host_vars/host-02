@@ -24,6 +24,8 @@ netplan_file: |
       enp3s0: {}
     version: 2
 
-### Listado (opcional) de dispositivos de almacenamiento para Ceph. Solo tiene sentido en hipervisores.
-storage_devices:
+### Listado de dispositivos separados por comas usados por cada OSD en los nodos hipervisores
+### En el ejemplo se crean dos OSDs, uno con un dispositivo y otro con dos
+OSD_storage_devices:
   - /dev/sdb
+  - /dev/sdc,/dev/sdd

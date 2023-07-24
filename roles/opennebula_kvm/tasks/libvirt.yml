@@ -1,15 +1,15 @@
 ---
-- name: Compartir la clave del usuario ceph con los hosts hipervisores
+- name: Compartir la clave del usuario ceph en todos los hosts hipervisores
   ansible.builtin.copy:
     content: |
-      "{{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get-key client.' + rbd_user) }}"
+      {{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get-key client.' + rbd_user) }}
     dest: "/var/lib/one/client.{{ rbd_user }}.key"
     mode: "644"
 
 - name: Compartir el fichero de autenticación de usuario ceph en todos los hosts hipervisores
   ansible.builtin.copy:
     content: |
-      "{{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get client.' + rbd_user) }}"
+      {{ lookup('pipe', 'ssh root@' + hostvars[groups['ceph_admins'][0]].ansible_host + ' ceph auth get client.' + rbd_user) }}
     dest: /etc/ceph/ceph.client.{{ rbd_user }}.keyring
     mode: "644"
 

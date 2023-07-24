@@ -1,6 +1,5 @@
 ---
-
-expand_opennebula: true
+expand_opennebula: false
 
 ### Clave default para oneadmin, la misma que en otros roles
 oneadmin_password: labpassword

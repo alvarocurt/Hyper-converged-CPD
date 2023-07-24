@@ -12,7 +12,7 @@
       ceph_pool:
         ceph_pool: "{{ rbd_pool }}"
         ceph_client: "{{ rbd_user }}"
-        ceph_secret: "{{ UUID }}"
+        ceph_secret: "{{ uuid }}"
         libvirt_hosts: "{{ groups['ceph_admins'] | map('extract', hostvars, 'ansible_host') | list }}"
         ceph_mons: "{{ groups['ceph_admins'] | map('extract', hostvars, 'cluster_ip') | join(' ') }}"
       public_net:

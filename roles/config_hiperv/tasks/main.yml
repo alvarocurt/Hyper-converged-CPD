@@ -3,12 +3,4 @@
   ansible.builtin.import_tasks: devices.yml
   when:
     - config_devices
-    - storage_devices is defined
-
-- name: Instalar Docker
-  ansible.builtin.import_tasks: docker.yml
-  when: install_docker
-
-- name: Iptables FORWARD ACCEPT
-  ansible.builtin.import_tasks: iptables.yml
-  when: config_iptables
+    - OSD_storage_devices is defined

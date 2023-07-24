@@ -19,7 +19,7 @@
 #   ansible.builtin.import_tasks: HA.yml
 #   when:
 #     - config_oned
-#     - not HA_result['failed']
+#     - ha
 
 # Tengo que ver si tras la HA, todos los hosts tienen la misma clave pero imagino que sí
 - name: Enviar claves a hipervisores
